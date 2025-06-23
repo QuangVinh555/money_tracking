@@ -6,7 +6,9 @@ import {
 } from 'react-router-dom';
 import Layout from './component/layout/Layout';
 import Dashboard from './pages/dashboard/Dashboard';
-import Transaction from './pages/transaction/Transaction';
+import Transactions from './pages/transactions/Transactions';
+import Categories from './pages/Categories/Categories';
+import Budgets from './pages/budgets/Budgets';
 
 function App() {
     return (
@@ -14,16 +16,15 @@ function App() {
             <Routes>
                 <Route path="/" element={<Layout />}>
                     <Route index element={<Dashboard />} />
-                    <Route path="transactions" element={<Transaction />} />
-                    {/* <Route path="categories" element={<Categories />} />
+                    <Route path="transactions" element={<Transactions />} />
+                    <Route path="categories" element={<Categories />} />
                     <Route path="budgets" element={<Budgets />} />
-                    <Route path="accounts" element={<Accounts />} />
+                    {/* <Route path="accounts" element={<Accounts />} />
                     <Route path="goals" element={<Goals />} /> */}
                 </Route>
                 {/* <Route path="*" element={<NotFound />} /> */}
             </Routes>
         </BrowserRouter>
-        // <Dashboard />
     )
 }
 

@@ -53,8 +53,8 @@ const Dashboard = () => {
                             <CalendarView transactions={transactions} />
                         </div>
                         <div className="space-y-6">
-                            {/* <ExpensePieChart data={expenseByCategory} /> */}
                             <RecentTransactions transactions={transactions} />
+                            <ExpensePieChart data={expenseByCategory} />
                         </div>
                     </div>
 
