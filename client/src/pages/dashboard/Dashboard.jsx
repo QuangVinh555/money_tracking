@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { mockData } from "../../constants/mock_data.js";
 import StatCard from "../../pages/dashboard/StatCard.jsx";
 import CalendarView from "../../pages/dashboard/CalendarView.jsx";
 import ExpensePieChart from "../../pages/dashboard/ExpensePieChart.jsx";
 import RecentTransactions from "../../pages/dashboard/RecentTransactions.jsx";
+import TransactionModal from "./TransactionModal.jsx";
+
 import {
   ChevronLeft,
   ChevronRight,
@@ -28,8 +30,25 @@ import {
 import Sidebar from "../../component/layout/Sidebar.jsx";
 
 const Dashboard = () => {
-  const { stats, transactions } = mockData;
+  const { stats } = mockData;
   const balance = stats.budgetLimit - stats.expenses;
+
+  const [allTransactions, setAllTransactions] = useState(mockData.transactions);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  const handleDayClick = (date) => {
+    setSelectedDate(date);
+    setModalOpen(true);
+  };
+
+  const handleAddTransaction = (newTransaction) => {
+    setAllTransactions((prev) =>
+      [...prev, newTransaction].sort(
+        (a, b) => new Date(b.date) - new Date(a.date)
+      )
+    );
+  };
 
   return (
     <div className="bg-gray-100 min-h-screen text-gray-800 font-sans">
@@ -68,7 +87,7 @@ const Dashboard = () => {
             <StatCard
               title="Hạn mức"
               amount={stats.budgetLimit}
-              icon={<CreditCard  size={24} className="text-green-500" />}
+              icon={<CreditCard size={24} className="text-green-500" />}
               colorClass="bg-green-100"
             />
             <StatCard
@@ -88,15 +107,26 @@ const Dashboard = () => {
           {/* Main Grid: Calendar and Charts */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
             <div className="xl:col-span-2">
-              <CalendarView transactions={transactions} />
+              <CalendarView
+                transactions={allTransactions}
+                onDayClick={handleDayClick}
+              />
             </div>
             <div className="space-y-6">
-              <RecentTransactions transactions={transactions} />
+              <RecentTransactions transactions={allTransactions} />
               {/* <ExpensePieChart data={expenseByCategory} /> */}
             </div>
           </div>
         </main>
       </div>
+      <TransactionModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        selectedDate={selectedDate}
+        transactions={allTransactions}
+        categories={mockData.categories}
+        onAddTransaction={handleAddTransaction}
+      />
     </div>
   );
 };

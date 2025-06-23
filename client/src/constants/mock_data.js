@@ -22,6 +22,7 @@ export const mockData = {
         { name: 'Nhà cửa', value: 2500000 },
         { name: 'Giải trí', value: 880000 },
     ],
+    categories: ['Ăn uống', 'Mua sắm', 'Di chuyển', 'Nhà cửa', 'Giải trí', 'Lương', 'Đầu tư'],
 };
 
 export const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF'];
