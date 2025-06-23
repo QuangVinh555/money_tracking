@@ -3,8 +3,8 @@
 export const mockData = {
     stats: {
         income: 25000000,
-        expenses: 12580000,
-        budgetLimit: 50000000
+        expenses: 8000000,
+        budgetLimit: 10000000
     },
     transactions: [
         { id: 1, type: 'expense', category: 'Ăn uống', description: 'Ăn trưa với đối tác', amount: 350000, date: '2025-06-15' },

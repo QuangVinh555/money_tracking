@@ -1,23 +1,11 @@
 import React from "react";
 import {
-  ChevronLeft,
-  ChevronRight,
   DollarSign,
-  TrendingUp,
-  TrendingDown,
-  ArrowRight,
-  ShoppingCart,
-  Utensils,
-  Car,
-  Home,
   LayoutDashboard,
   Repeat,
-  BarChart3,
   Wallet,
   Settings,
   Gem,
-  Download,
-  PlusCircle,
   CreditCard,
 } from "lucide-react";
 import { useLocation } from "react-router-dom";
@@ -38,14 +26,14 @@ export const menuItems = [
   },
   { name: "Ngân sách", icon: <Wallet />, path: "/budgets", active: false },
   // { name: 'Báo cáo', icon: <BarChart3 />, active: false },
-  { name: "Cài đặt", icon: <Settings />, path: "/setting", active: false },
+//   { name: "Cài đặt", icon: <Settings />, path: "/setting", active: false },
 ];
 
 const Sidebar = () => {
   const location = useLocation();
 
   return (
-    <aside className="w-20 lg:w-64 bg-white p-4 lg:p-6 flex flex-col border-r h-screen sticky top-0">
+    <aside className="w-20 lg:w-64 bg-white p-4 lg:p-6 flex flex-col border-r h-screen fixed top-0">
       <a
         href="#"
         className="flex items-center gap-2 mb-10 self-center lg:self-start"
