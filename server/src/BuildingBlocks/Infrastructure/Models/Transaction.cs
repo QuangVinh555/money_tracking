@@ -13,7 +13,7 @@ public partial class Transaction
 
     public decimal Amount { get; set; }
 
-    public DateOnly TransactionDate { get; set; }
+    public DateTime TransactionDate { get; set; }
 
     public bool? Actived { get; set; }
 

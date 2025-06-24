@@ -1,4 +1,8 @@
-﻿using Infrastructure.Models;
+﻿using System.Text.Json.Serialization;
+using System.Text.Json;
+using Application.Features.Commands.Transactions;
+using Infrastructure.Models;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,9 +14,18 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 // Cấu hình DbContext với PostgreSQL
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
+
+// Cấu hình MediatR
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(CreateTransactionsCommand).Assembly));
+
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(
+        new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+    );
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
