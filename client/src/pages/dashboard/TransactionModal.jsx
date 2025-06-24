@@ -45,12 +45,12 @@ const TransactionModal = ({
   categories,
   onAddTransaction,
 }) => {
-if (!isOpen) return null;
+  if (!isOpen) return null;
 
-const [txType, setTxType] = useState("expense");
-const [amount, setAmount] = useState("");
-const [category, setCategory] = useState(categories[0]);
-const [description, setDescription] = useState("");
+  const [txType, setTxType] = useState("expense");
+  const [amount, setAmount] = useState("");
+  const [category, setCategory] = useState(categories[0]);
+  const [description, setDescription] = useState("");
 
   const transactionsForDate = transactions.filter(
     (tx) => tx.date === selectedDate.toISOString().split("T")[0]
@@ -126,35 +126,25 @@ const [description, setDescription] = useState("");
                 <button
                   type="button"
                   onClick={() => setTxType("expense")}
-                  className={`flex-1 py-2 rounded-lg font-semibold transition-colors ${
-                    txType === "expense"
+                  className={`flex-1 py-2 rounded-lg font-semibold transition-colors ${txType === "expense"
                       ? "bg-red-500 text-white"
                       : "bg-gray-200"
-                  }`}
+                    }`}
                 >
                   Chi tiêu
                 </button>
                 <button
                   type="button"
                   onClick={() => setTxType("income")}
-                  className={`flex-1 py-2 rounded-lg font-semibold transition-colors ${
-                    txType === "income"
+                  className={`flex-1 py-2 rounded-lg font-semibold transition-colors ${txType === "income"
                       ? "bg-green-500 text-white"
                       : "bg-gray-200"
-                  }`}
+                    }`}
                 >
                   Thu nhập
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="Số tiền"
-                  className="w-full p-2 border rounded-lg"
-                  required
-                />
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
@@ -166,6 +156,14 @@ const [description, setDescription] = useState("");
                     </option>
                   ))}
                 </select>
+                <input
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="Số tiền"
+                  className="w-full p-2 border rounded-lg"
+                  required
+                />
               </div>
               <input
                 type="text"
@@ -203,9 +201,8 @@ const [description, setDescription] = useState("");
                       <p className="font-semibold">{tx.description}</p>
                     </div>
                     <p
-                      className={`font-bold ${
-                        tx.type === "income" ? "text-green-500" : "text-red-500"
-                      }`}
+                      className={`font-bold ${tx.type === "income" ? "text-green-500" : "text-red-500"
+                        }`}
                     >
                       {tx.type === "income" ? "+" : "-"}{" "}
                       {formatCurrency(tx.amount)}
