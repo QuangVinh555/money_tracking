@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Core.Common;
-using Core.Enums;
 using Infrastructure.Models;
 using MediatR;
 
@@ -16,7 +15,10 @@ namespace Application.Features.Commands.Transactions
         public int CategoryId { get; set; }
         public decimal Amount { get; set; }
         public DateTime Transaction_Date { get; set; }
-        public TransactionType Transaction_Type { get; set; }
+
+        // 1: income, 2: expense
+        public int Transaction_Type { get; set; }
+        public string Description { get; set; } = string.Empty;
     }
 
     public class CreateTransactionsCommandHandler : IRequestHandler<CreateTransactionsCommand, ApiResponse<bool>>
@@ -31,13 +33,24 @@ namespace Application.Features.Commands.Transactions
         {
             try
             {
+                if(request.Transaction_Type != 1 && request.Transaction_Type != 2)
+                {
+                    return ApiResponse<bool>.FailResponse("Loại giao dịch không hợp lệ.", new List<string>
+                    {
+                        "Transaction_Type phải là 1 (income) hoặc 2 (expense)."
+                    });
+                }
                 var transaction = new Transaction
                 {
                     UserId = request.UserId,
                     CategoryId = request.CategoryId,
+                    Description = request.Description,
                     Amount = request.Amount,
                     TransactionDate = request.Transaction_Date,
-                    TransactionType = request.Transaction_Type
+                    TransactionType = request.Transaction_Type,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    Actived = true,
                 };
 
                 _context.Transactions.Add(transaction);

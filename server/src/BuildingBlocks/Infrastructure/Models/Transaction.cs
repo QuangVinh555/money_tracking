@@ -23,6 +23,10 @@ public partial class Transaction
 
     public DateTime? DeletedAt { get; set; }
 
+    public int? TransactionType { get; set; }
+
+    public string? Description { get; set; }
+
     public virtual Category Category { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;

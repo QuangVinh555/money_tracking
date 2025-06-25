@@ -4,6 +4,7 @@ using Application.Features.Commands.Transactions;
 using Infrastructure.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Application.Features.Queries.Transaction;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Cấu hình MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(CreateTransactionsCommand).Assembly));
+
+// Cấu hình Query
+builder.Services.AddScoped<ITransactionQuery, TransactionsQuery>();
 
 // Add services to the container.
 

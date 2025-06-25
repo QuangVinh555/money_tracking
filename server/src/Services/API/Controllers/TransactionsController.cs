@@ -1,4 +1,7 @@
 ﻿using Application.Features.Commands.Transactions;
+using Application.Features.DTOs.Transactions;
+using Application.Features.Queries.Transaction;
+using Core.Common;
 using Infrastructure.Models;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -12,20 +15,21 @@ namespace server.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IMediator _mediator;
+        private readonly ITransactionQuery _transactionQuery;
 
-        public TransactionsController(AppDbContext context, IMediator mediator) {
+        public TransactionsController(AppDbContext context, IMediator mediator, ITransactionQuery transactionQuery) {
             _context = context;      
             _mediator = mediator;
-        }
-        [HttpGet]
-        public IActionResult GetListTransactions()
-        {
-            var transactions = _context.Transactions.ToList();
-            return Ok(transactions);
+            _transactionQuery = transactionQuery;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateTransaction(CreateTransactionsCommand request)
+        /// <summary>
+        /// Thêm mới giao dịch.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateTransaction([FromBody] CreateTransactionsCommand request)
         {
             var response = await _mediator.Send(request);
 
@@ -36,6 +40,59 @@ namespace server.Controllers
                 return BadRequest(response); // 400
 
             return StatusCode(500, response); // fallback
+        }
+
+        /// <summary>
+        /// Lấy danh sách giao dịch tháng hiện tại.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("current-month")]
+        public async Task<IActionResult> GetAllTransactionsByCurrentMonth()
+        {
+            var data = await _transactionQuery.GetAllTransactionsByCurrentMonth();
+
+            return Ok(new ApiResponse<List<TransactionsResponse>>
+            {
+                Success = true,
+                Data = data,
+                Message = "Lấy danh sách giao dịch tháng hiện tại thành công."
+            });
+        }
+
+        /// <summary>
+        /// Lấy danh sách giao dịch ngày(tùy chọn).
+        /// </summary>
+        /// <param name="OptionTime"></param>
+        /// <returns></returns>
+        [HttpGet("by-date")]
+        public async Task<IActionResult> GetAllTransactionsByDate([FromQuery] DateTime OptionTime)
+        {
+            var data = await _transactionQuery.GetAllTransactionsByDate(OptionTime);
+
+            return Ok(new ApiResponse<List<TransactionsResponse>>
+            {
+                Success = true,
+                Data = data,
+                Message = "Lấy danh sách giao dịch ngày này thành công."
+            });
+        }
+
+        /// <summary>
+        /// Tính tổng các card.
+        /// </summary>
+        /// <param name="OptionTime"></param>
+        /// <returns></returns>
+        [HttpGet("total-card")]
+        public async Task<IActionResult> TransactionsTotalCardByDate([FromQuery] DateTime OptionTime)
+        {
+            var data = await _transactionQuery.TransactionsTotalCardByDate(OptionTime);
+
+            return Ok(new ApiResponse<TransactionsTotalCardResponse>
+            {
+                Success = true,
+                Data = data,
+                Message = "Tính tổng các card thành công."
+            });
         }
     }
 }
