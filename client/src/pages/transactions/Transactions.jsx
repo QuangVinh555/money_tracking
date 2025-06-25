@@ -1,7 +1,9 @@
 import { Search, Filter, Plus } from "lucide-react";
 import { useState } from "react";
 
-const transactions = [
+import useTransactions from "../../hook/transactions";
+
+const transactionsTest = [
   { id: 1, date: "2024-06-19", description: "Cà phê Starbucks", category: "Ăn uống", amount: -185000, account: "Tiền mặt" },
   { id: 2, date: "2024-06-18", description: "Xăng xe", category: "Di chuyển", amount: -800000, account: "Thẻ tín dụng" },
   { id: 3, date: "2024-06-17", description: "Mua đồ ăn", category: "Ăn uống", amount: -450000, account: "Ví điện tử" },
@@ -20,6 +22,9 @@ export default function Transactions() {
     date: ""
   });
 
+  const { transactions } = useTransactions();
+  console.log(transactions)
+  
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
@@ -83,7 +88,7 @@ export default function Transactions() {
             </div>
             <div className="p-6">
               <div className="space-y-4">
-                {transactions.map((transaction) => (
+                {transactionsTest.map((transaction) => (
                   <div key={transaction.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                     <div className="flex-1">
                       <div className="flex items-center gap-4">

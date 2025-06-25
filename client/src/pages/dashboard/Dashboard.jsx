@@ -5,6 +5,7 @@ import CalendarView from "../../pages/dashboard/CalendarView.jsx";
 import ExpensePieChart from "../../pages/dashboard/ExpensePieChart.jsx";
 import RecentTransactions from "../../pages/dashboard/RecentTransactions.jsx";
 import TransactionModal from "./TransactionModal.jsx";
+import SpendingLimitModal from "./SpendingLimitModal.jsx";
 
 import {
   ChevronLeft,
@@ -26,6 +27,7 @@ import {
   Gem,
   Download,
   PlusCircle,
+  Target
 } from "lucide-react";
 import Sidebar from "../../component/layout/Sidebar.jsx";
 
@@ -35,6 +37,8 @@ const Dashboard = () => {
 
   const [allTransactions, setAllTransactions] = useState(mockData.transactions);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isLimitModalOpen, setLimitModalOpen] = useState(false);
+
   const [selectedDate, setSelectedDate] = useState(null);
 
   const handleDayClick = (date) => {
@@ -48,6 +52,11 @@ const Dashboard = () => {
         (a, b) => new Date(b.date) - new Date(a.date)
       )
     );
+  };
+
+  const handleSetLimit = (newLimit) => {
+    setAllTransactions(prev => ({ ...prev, stats: { ...prev.stats, spendingLimit: newLimit } }));
+    setLimitModalOpen(false);
   };
 
   return (
@@ -89,6 +98,7 @@ const Dashboard = () => {
               amount={stats.budgetLimit}
               icon={<CreditCard size={24} className="text-green-500" />}
               colorClass="bg-green-100"
+              onEdit={() => setLimitModalOpen(true)}
             />
             <StatCard
               title="Tổng chi"
@@ -127,6 +137,7 @@ const Dashboard = () => {
         categories={mockData.categories}
         onAddTransaction={handleAddTransaction}
       />
+      <SpendingLimitModal isOpen={isLimitModalOpen} onClose={() => setLimitModalOpen(false)} currentLimit={stats.spendingLimit} onSetLimit={handleSetLimit} />
     </div>
   );
 };
