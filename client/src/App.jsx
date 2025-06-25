@@ -7,7 +7,7 @@ import {
 import Layout from './component/layout/Layout';
 import Dashboard from './pages/dashboard/Dashboard';
 import Transactions from './pages/transactions/Transactions';
-import Categories from './pages/Categories/Categories';
+import Categories from './pages/categories/Categories';
 import Budgets from './pages/budgets/Budgets';
 
 function App() {

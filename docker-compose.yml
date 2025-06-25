@@ -6,3 +6,40 @@ services:
       context: ./client
     ports:
       - "3000:80"
+    networks:
+      - money_tracking-network
+
+  backend:
+    build:
+      context: ./server
+    ports:
+      - "5290:80"  # Ánh xạ cổng 5290 (theo launchSettings.json) tới cổng 80 trong container
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development  # Chạy ở môi trường Development để bật Swagger
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=money_tracking;Username=postgres;Password=postgres
+    depends_on:
+      - postgres
+    networks:
+      - money_tracking-network
+    # volumes:
+    #   - ./server:/app
+
+  postgres:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=money_tracking
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - money_tracking-network
+
+volumes:
+  postgres_data:
+
+networks:
+  money_tracking-network:
