@@ -17,7 +17,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development  # Chạy ở môi trường Development để bật Swagger
       - ASPNETCORE_URLS=http://+:80
-      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5435;Database=money_tracking;Username=postgres;Password=postgres
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=money_tracking;Username=postgres;Password=postgres
     depends_on:
       - postgres
     networks:
