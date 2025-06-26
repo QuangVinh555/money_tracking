@@ -32,6 +32,12 @@ namespace Application.Features.Queries.Transaction
         /// <param name="OptionDate"></param>
         /// <returns></returns>
         public Task<TransactionsTotalCardResponse> TransactionsTotalCardByDate(DateTime? OptionDate);
+
+        /// <summary>
+        /// Lấy ra các giao dịch trong tháng nhóm lại theo từng ngày trong tháng
+        /// </summary>
+        /// <returns></returns>
+        public Task<List<TransactionsGroupByDateResponse>> GetTransactionsGroupByDate();
     }
     public class TransactionsQuery : ITransactionQuery
     {
@@ -132,6 +138,47 @@ namespace Application.Features.Queries.Transaction
                 Income = totalIncome,
                 Expense = totalExpense,
             };
+        }
+
+        public async Task<List<TransactionsGroupByDateResponse>> GetTransactionsGroupByDate()
+        {
+            // Lấy ngày hiện tại
+            var now = DateTime.UtcNow;
+
+            // Chuyển về ngày đầu tháng(UTC) và chọn tới cuối tháng
+            var firstDayOfMonth = DateTime.SpecifyKind(new DateTime(now.Year, now.Month, 1), DateTimeKind.Utc);
+            var firstDayOfNextMonth = firstDayOfMonth.AddMonths(1);
+
+            var transactions = await _context.Transactions
+                .Where(t => t.TransactionDate >= firstDayOfMonth && t.TransactionDate < firstDayOfNextMonth && t.Actived == true)
+                .Include(t => t.User)
+                .Include(t => t.Category)
+                .Select(t => new TransactionsResponse
+                {
+                    TransactionId = t.TransactionId,
+                    UserId = t.UserId,
+                    FullName = t.User.Fullname,
+                    CategoryId = t.CategoryId,
+                    CategoryName = t.Category.CategoryName,
+                    Description = t.Description ?? "",
+                    Amount = t.Amount,
+                    TransactionDate = t.TransactionDate,
+                    TransactionType = t.TransactionType,
+                    TransactionTypeName = t.TransactionType == 1 ? ConstTransactionType.INCOME : ConstTransactionType.EXPENSE,
+                    Actived = t.Actived,
+                    CreatedAt = t.CreatedAt,
+                    UpdateAt = t.UpdatedAt,
+                })
+                .GroupBy(t => t.TransactionDate.Date)               // Group by theo ngày giao dịch .Date để đưa phần giờ về 00:00:00
+                .Select(g => new TransactionsGroupByDateResponse
+                {
+                    DateTime = g.Key,
+                    Transactions = g.ToList()
+                })
+                .OrderByDescending(t => t.DateTime)
+                .ToListAsync();
+
+            return transactions;
         }
     }
 }

@@ -94,5 +94,23 @@ namespace server.Controllers
                 Message = "Tính tổng các card thành công."
             });
         }
+
+        /// <summary>
+        /// Lấy ra các giao dịch trong tháng nhóm lại theo từng ngày trong tháng
+        /// </summary>
+        /// <param name="OptionTime"></param>
+        /// <returns></returns>
+        [HttpGet("get-by-date")]
+        public async Task<IActionResult> GetTransactionsGroupByDate()
+        {
+            var data = await _transactionQuery.GetTransactionsGroupByDate();
+
+            return Ok(new ApiResponse<List<TransactionsGroupByDateResponse>>
+            {
+                Success = true,
+                Data = data,
+                Message = "Lấy ra các giao dịch thành công"
+            });
+        }
     }
 }
