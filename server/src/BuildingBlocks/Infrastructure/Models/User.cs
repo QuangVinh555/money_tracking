@@ -23,5 +23,7 @@ public partial class User
 
     public virtual ICollection<Budget> Budgets { get; set; } = new List<Budget>();
 
+    public virtual ICollection<BudgetsLimit> BudgetsLimits { get; set; } = new List<BudgetsLimit>();
+
     public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 }

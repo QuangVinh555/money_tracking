@@ -83,7 +83,7 @@ namespace server.Controllers
         /// <param name="OptionTime"></param>
         /// <returns></returns>
         [HttpGet("total-card")]
-        public async Task<IActionResult> TransactionsTotalCardByDate([FromQuery] DateTime OptionTime)
+        public async Task<IActionResult> TransactionsTotalCardByDate([FromQuery] DateTime? OptionTime)
         {
             var data = await _transactionQuery.TransactionsTotalCardByDate(OptionTime);
 
@@ -100,7 +100,7 @@ namespace server.Controllers
         /// </summary>
         /// <param name="OptionTime"></param>
         /// <returns></returns>
-        [HttpGet("get-by-date")]
+        [HttpGet("get-by-group-date")]
         public async Task<IActionResult> GetTransactionsGroupByDate()
         {
             var data = await _transactionQuery.GetTransactionsGroupByDate();

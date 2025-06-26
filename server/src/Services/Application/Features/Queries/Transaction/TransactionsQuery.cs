@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Application.Features.DTOs.Transactions;
 using Core.Constanst;
+using Core.Extensions;
 using Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -52,8 +53,8 @@ namespace Application.Features.Queries.Transaction
             var now = DateTime.UtcNow;
 
             // Chuyển về ngày đầu tháng(UTC) và chọn tới cuối tháng
-            var firstDayOfMonth = DateTime.SpecifyKind(new DateTime(now.Year, now.Month, 1), DateTimeKind.Utc);
-            var firstDayOfNextMonth = firstDayOfMonth.AddMonths(1);
+            var firstDayOfMonth = DateTimeExtensions.ToUtcStartOfMonth(now);
+            var firstDayOfNextMonth = DateTimeExtensions.ToUtcEndOfMonth(now);
 
             var transactions = await _context.Transactions
                 .Where(t => t.TransactionDate >= firstDayOfMonth && t.TransactionDate < firstDayOfNextMonth && t.Actived == true)
@@ -84,8 +85,8 @@ namespace Application.Features.Queries.Transaction
         public async Task<List<TransactionsResponse>> GetAllTransactionsByDate(DateTime OptionDate)
         {
             // Chuyển về kiểu (UTC) và chọn tới cuối ngày
-            var fromDate = new DateTime(OptionDate.Year, OptionDate.Month, OptionDate.Day, 0, 0, 0, DateTimeKind.Utc);
-            var toDate = fromDate.AddDays(1);
+            var fromDate = DateTimeExtensions.ToUtcStartOfMonth(OptionDate);
+            var toDate = DateTimeExtensions.ToUtcEndOfMonth(OptionDate);
 
             var transactions = await _context.Transactions
                 .Where(t =>  t.TransactionDate >= fromDate && t.TransactionDate < toDate && t.Actived == true)
@@ -120,8 +121,8 @@ namespace Application.Features.Queries.Transaction
             }
 
             // Chuyển về kiểu (UTC) và chọn tới cuối ngày
-            var fromDate = new DateTime(OptionDate.Value.Year, OptionDate.Value.Month, OptionDate.Value.Day, 0, 0, 0, DateTimeKind.Utc);
-            var toDate = fromDate.AddMonths(1);
+            var fromDate = DateTimeExtensions.ToUtcStartOfMonth(OptionDate.Value);
+            var toDate = DateTimeExtensions.ToUtcEndOfMonth(OptionDate.Value);
 
             // Tổng thu nhập
             var totalIncome = await _context.Transactions
@@ -133,10 +134,16 @@ namespace Application.Features.Queries.Transaction
                 .Where(t => t.TransactionType == 2 && t.TransactionDate >= fromDate && t.TransactionDate < toDate)
                 .SumAsync(t => t.Amount);
 
+            // Hạn mức (Lấy ngày đầu tiên của tháng để so sánh với cột ngày đầu tiên của hạn mức)
+            var budgetLimit = await _context.BudgetsLimits
+                .Where(b => b.BudgetsLimitStartDate != null && b.BudgetsLimitStartDate.Value.Date == fromDate.Date)
+                .FirstOrDefaultAsync();
+
             return new TransactionsTotalCardResponse
             {
                 Income = totalIncome,
                 Expense = totalExpense,
+                BudgetLimit = budgetLimit?.BudgetsLimitTotal ?? 0,
             };
         }
 
@@ -146,8 +153,8 @@ namespace Application.Features.Queries.Transaction
             var now = DateTime.UtcNow;
 
             // Chuyển về ngày đầu tháng(UTC) và chọn tới cuối tháng
-            var firstDayOfMonth = DateTime.SpecifyKind(new DateTime(now.Year, now.Month, 1), DateTimeKind.Utc);
-            var firstDayOfNextMonth = firstDayOfMonth.AddMonths(1);
+            var firstDayOfMonth = DateTimeExtensions.ToUtcStartOfMonth(now);
+            var firstDayOfNextMonth = DateTimeExtensions.ToUtcEndOfMonth(now);
 
             var transactions = await _context.Transactions
                 .Where(t => t.TransactionDate >= firstDayOfMonth && t.TransactionDate < firstDayOfNextMonth && t.Actived == true)

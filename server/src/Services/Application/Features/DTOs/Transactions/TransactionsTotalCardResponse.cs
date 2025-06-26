@@ -10,7 +10,7 @@ namespace Application.Features.DTOs.Transactions
     {
         public decimal Income { get; set; }
         public decimal Expense { get; set; }    
-        public decimal BudgetLimit { get; set; }
-        public decimal Balance => Income - Expense;
+        public decimal? BudgetLimit { get; set; }
+        public decimal Balance => (BudgetLimit ?? 0) - Expense;
     }
 }

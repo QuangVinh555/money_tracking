@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Core.Common;
+using Core.Extensions;
 using Infrastructure.Models;
 using MediatR;
 
@@ -33,20 +34,25 @@ namespace Application.Features.Commands.Transactions
         {
             try
             {
-                if(request.Transaction_Type != 1 && request.Transaction_Type != 2)
+                // Gía trị Transaction_Type phải là 1 hoặc 2
+                if (request.Transaction_Type != 1 && request.Transaction_Type != 2)
                 {
                     return ApiResponse<bool>.FailResponse("Loại giao dịch không hợp lệ.", new List<string>
                     {
                         "Transaction_Type phải là 1 (income) hoặc 2 (expense)."
                     });
                 }
+
+                // Ép kiểu về UTC
+                var transactionDate = DateTimeExtensions.EnsureUtc(request.Transaction_Date);
+
                 var transaction = new Transaction
                 {
                     UserId = request.UserId,
                     CategoryId = request.CategoryId,
                     Description = request.Description,
                     Amount = request.Amount,
-                    TransactionDate = request.Transaction_Date,
+                    TransactionDate = transactionDate,
                     TransactionType = request.Transaction_Type,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,

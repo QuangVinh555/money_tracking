@@ -6,16 +6,14 @@ namespace Infrastructure.Models;
 
 public partial class AppDbContext : DbContext
 {
-    public AppDbContext()
-    {
-    }
-
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
     {
     }
 
     public virtual DbSet<Budget> Budgets { get; set; }
+
+    public virtual DbSet<BudgetsLimit> BudgetsLimits { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
 
@@ -58,6 +56,35 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.Budgets)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("budgets_user_id_fkey");
+        });
+
+        modelBuilder.Entity<BudgetsLimit>(entity =>
+        {
+            entity.HasKey(e => e.BudgetsLimitId).HasName("budgets_limit_pkey");
+
+            entity.ToTable("budgets_limit");
+
+            entity.Property(e => e.BudgetsLimitId).HasColumnName("budgets_limit_id");
+            entity.Property(e => e.Actived)
+                .HasDefaultValue(true)
+                .HasColumnName("actived");
+            entity.Property(e => e.BudgetsLimitEndDate).HasColumnName("budgets_limit_end_date");
+            entity.Property(e => e.BudgetsLimitStartDate).HasColumnName("budgets_limit_start_date");
+            entity.Property(e => e.BudgetsLimitTotal)
+                .HasPrecision(15, 2)
+                .HasColumnName("budgets_limit_total");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnName("created_at");
+            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnName("updated_at");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.User).WithMany(p => p.BudgetsLimits)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("budgets_limit_user_id_fkey");
         });
 
         modelBuilder.Entity<Category>(entity =>
