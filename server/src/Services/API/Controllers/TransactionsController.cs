@@ -43,6 +43,25 @@ namespace server.Controllers
         }
 
         /// <summary>
+        /// Cập nhật giao dịch.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateTransaction([FromBody] UpdateTransactionsCommand request)
+        {
+            var response = await _mediator.Send(request);
+
+            if (response.Success)
+                return Ok(response); // 200
+
+            if (response.Errors != null && response.Errors.Any())
+                return BadRequest(response); // 400
+
+            return StatusCode(500, response); // fallback
+        }
+
+        /// <summary>
         /// Lấy danh sách giao dịch tháng hiện tại.
         /// </summary>
         /// <returns></returns>

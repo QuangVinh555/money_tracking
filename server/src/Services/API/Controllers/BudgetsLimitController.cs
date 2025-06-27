@@ -25,8 +25,8 @@ namespace server.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("create")]
-        public async Task<IActionResult> CreateBudgetsLimit([FromBody] CreateBudgetsLimitCommand request)
+        [HttpPost]
+        public async Task<IActionResult> CreateBudgetsLimit([FromBody] CreateOrUpdateBudgetsLimitCommand request)
         {
             var response = await _mediator.Send(request);
 
