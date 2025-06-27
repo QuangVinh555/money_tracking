@@ -36,6 +36,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Amount)
                 .HasPrecision(15, 2)
                 .HasColumnName("amount");
+            entity.Property(e => e.BudgetsLimitId).HasColumnName("budgets_limit_id");
             entity.Property(e => e.CategoryId).HasColumnName("category_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")

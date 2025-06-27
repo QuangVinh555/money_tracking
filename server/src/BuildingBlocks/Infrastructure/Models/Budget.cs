@@ -13,9 +13,9 @@ public partial class Budget
 
     public decimal Amount { get; set; }
 
-    public DateOnly StartDate { get; set; }
+    public DateTime StartDate { get; set; }
 
-    public DateOnly EndDate { get; set; }
+    public DateTime EndDate { get; set; }
 
     public bool? Actived { get; set; }
 
@@ -24,6 +24,8 @@ public partial class Budget
     public DateTime? UpdatedAt { get; set; }
 
     public DateTime? DeletedAt { get; set; }
+
+    public int? BudgetsLimitId { get; set; }
 
     public virtual Category Category { get; set; } = null!;
 

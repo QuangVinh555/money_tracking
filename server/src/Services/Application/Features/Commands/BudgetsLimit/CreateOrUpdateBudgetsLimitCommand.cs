@@ -53,6 +53,7 @@ namespace Application.Features.Commands.BudgetsLimit
                         && b.Actived == true
                     );
 
+                // Cập nhật hạn mức
                 if (exitedBudgetsLimit != null)
                 {
                     exitedBudgetsLimit.BudgetsLimitTotal = request.Budgets_Limit_Total;
@@ -62,10 +63,26 @@ namespace Application.Features.Commands.BudgetsLimit
                     //_context.Entry(exitedBudgetsLimit).Property(b => b.BudgetsLimitTotal).IsModified = true;
                     //_context.Entry(exitedBudgetsLimit).Property(b => b.UpdatedAt).IsModified = true;
 
+                    // Kiểm tra xem các ngân sách danh mục con có đang sử dụng hạn mức này không
+                    // Nếu có thì xóa đi, để user tự tạo lại danh mục con cho hạn mức mới
+                    var exitedBudgetsCategories = await _context.Budgets
+                        .Where(b => b.BudgetsLimitId == exitedBudgetsLimit.BudgetsLimitId && b.Actived == true)
+                        .ToListAsync();
+
+                    if(exitedBudgetsCategories.Any())
+                    {
+                        foreach (var budget in exitedBudgetsCategories)
+                        {
+                            budget.Actived = false;
+                            budget.DeletedAt = DateTime.UtcNow;
+                        }
+                    }
+
                     await _context.SaveChangesAsync(cancellationToken);
 
                     return ApiResponse<bool>.SuccessResponse(true, "Cập nhật hạn mức thành công.");
                 }
+                // Thêm mới hạn mức
                 else
                 {
                     var budgetsLimit = new Infrastructure.Models.BudgetsLimit
