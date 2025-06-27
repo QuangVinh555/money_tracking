@@ -33,15 +33,15 @@ namespace Application.Features.Commands.BudgetsLimit
             {
                 /*
                     - Chuyển về ngày đầu tháng(UTC) và chọn tới cuối tháng(UTC)
-                    + True: Có giá trị(FE đã tự chuyển ngày đầu và cuối) thì dùng hàm EnsureUtc kiểm tra kind = UTC hay không để ép kiểu về UTC
+                    + True: Sẽ lấy theo ngày của FE truyền xuống và chuyển theo đầu tháng - cuối tháng
                     + False: Sẽ lấy ngày hiện tại và chuyển theo đầu tháng - cuối tháng
                 */
                 request.Budgets_StartDate = request.Budgets_StartDate.HasValue
-                    ? DateTimeExtensions.EnsureUtc(request.Budgets_StartDate.Value) 
+                    ? DateTimeExtensions.ToUtcStartOfMonth(request.Budgets_StartDate.Value) 
                     : DateTimeExtensions.ToUtcStartOfMonth(DateTime.UtcNow);
 
                 request.Budgets_EndDate = request.Budgets_EndDate.HasValue
-                    ? DateTimeExtensions.EnsureUtc(request.Budgets_EndDate.Value)
+                    ? DateTimeExtensions.ToUtcEndOfMonth(request.Budgets_EndDate.Value)
                     : DateTimeExtensions.ToUtcEndOfMonth(DateTime.UtcNow);
 
                 // Kiểm tra userId này vào tháng này đã có thêm hạn mức hay chưa

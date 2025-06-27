@@ -38,7 +38,7 @@ namespace Application.Features.Queries.Transaction
         /// Lấy ra các giao dịch trong tháng nhóm lại theo từng ngày trong tháng
         /// </summary>
         /// <returns></returns>
-        public Task<List<TransactionsGroupByDateResponse>> GetTransactionsGroupByDate();
+        public Task<List<TransactionsGroupByDateResponse>> GetTransactionsGroupByDate(DateTime? OptionDate);
     }
     public class TransactionsQuery : ITransactionQuery
     {
@@ -147,14 +147,24 @@ namespace Application.Features.Queries.Transaction
             };
         }
 
-        public async Task<List<TransactionsGroupByDateResponse>> GetTransactionsGroupByDate()
+        public async Task<List<TransactionsGroupByDateResponse>> GetTransactionsGroupByDate(DateTime? OptionDate)
         {
+            
             // Lấy ngày hiện tại
             var now = DateTime.UtcNow;
 
-            // Chuyển về ngày đầu tháng(UTC) và chọn tới cuối tháng
-            var firstDayOfMonth = DateTimeExtensions.ToUtcStartOfMonth(now);
-            var firstDayOfNextMonth = DateTimeExtensions.ToUtcEndOfMonth(now);
+            /*
+                - Chuyển về ngày đầu tháng(UTC) và chọn tới cuối tháng(UTC)
+                + True: Sẽ lấy theo ngày của FE truyền xuống và chuyển theo đầu tháng - cuối tháng
+                + False: Sẽ lấy ngày hiện tại và chuyển theo đầu tháng - cuối tháng
+            */
+            var firstDayOfMonth = OptionDate.HasValue 
+                ? DateTimeExtensions.ToUtcStartOfMonth(OptionDate.Value) 
+                : DateTimeExtensions.ToUtcStartOfMonth(now);
+
+            var firstDayOfNextMonth = OptionDate.HasValue 
+                ? DateTimeExtensions.ToUtcEndOfMonth(OptionDate.Value)
+                : DateTimeExtensions.ToUtcEndOfMonth(now);
 
             var transactions = await _context.Transactions
                 .Where(t => t.TransactionDate >= firstDayOfMonth && t.TransactionDate < firstDayOfNextMonth && t.Actived == true)

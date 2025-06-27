@@ -81,12 +81,12 @@ namespace server.Controllers
         /// <summary>
         /// Lấy danh sách giao dịch ngày(tùy chọn).
         /// </summary>
-        /// <param name="OptionTime"></param>
+        /// <param name="OptionDate"></param>
         /// <returns></returns>
         [HttpGet("by-date")]
-        public async Task<IActionResult> GetAllTransactionsByDate([FromQuery] DateTime OptionTime)
+        public async Task<IActionResult> GetAllTransactionsByDate([FromQuery] DateTime OptionDate)
         {
-            var data = await _transactionQuery.GetAllTransactionsByDate(OptionTime);
+            var data = await _transactionQuery.GetAllTransactionsByDate(OptionDate);
 
             return Ok(new ApiResponse<List<TransactionsResponse>>
             {
@@ -99,12 +99,12 @@ namespace server.Controllers
         /// <summary>
         /// Tính tổng các card.
         /// </summary>
-        /// <param name="OptionTime"></param>
+        /// <param name="OptionDate"></param>
         /// <returns></returns>
         [HttpGet("total-card")]
-        public async Task<IActionResult> TransactionsTotalCardByDate([FromQuery] DateTime? OptionTime)
+        public async Task<IActionResult> TransactionsTotalCardByDate([FromQuery] DateTime? OptionDate)
         {
-            var data = await _transactionQuery.TransactionsTotalCardByDate(OptionTime);
+            var data = await _transactionQuery.TransactionsTotalCardByDate(OptionDate);
 
             return Ok(new ApiResponse<TransactionsTotalCardResponse>
             {
@@ -117,12 +117,12 @@ namespace server.Controllers
         /// <summary>
         /// Lấy ra các giao dịch trong tháng nhóm lại theo từng ngày trong tháng
         /// </summary>
-        /// <param name="OptionTime"></param>
+        /// <param name="OptionDate"></param>
         /// <returns></returns>
         [HttpGet("get-by-group-date")]
-        public async Task<IActionResult> GetTransactionsGroupByDate()
+        public async Task<IActionResult> GetTransactionsGroupByDate(DateTime? OptionDate)
         {
-            var data = await _transactionQuery.GetTransactionsGroupByDate();
+            var data = await _transactionQuery.GetTransactionsGroupByDate(OptionDate);
 
             return Ok(new ApiResponse<List<TransactionsGroupByDateResponse>>
             {
