@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosClient = axios.create({
-  baseURL: 'https://your-api.com/api', // 👈 thay bằng base URL thật
+  baseURL: 'http://localhost:5290/api', // 👈 thay bằng base URL thật
   headers: {
     'Content-Type': 'application/json',
   },

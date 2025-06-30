@@ -8,7 +8,7 @@ namespace Application.Features.DTOs.Transactions
 {
     public class TransactionsGroupByDateResponse
     {
-        public DateTime DateTime { get; set; }
+        public string DateTime { get; set; } = string.Empty;
         public List<TransactionsResponse> Transactions { get; set; } = new();
     }
 }

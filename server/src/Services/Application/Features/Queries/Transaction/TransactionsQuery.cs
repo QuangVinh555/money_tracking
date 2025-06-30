@@ -186,16 +186,20 @@ namespace Application.Features.Queries.Transaction
                     CreatedAt = t.CreatedAt,
                     UpdateAt = t.UpdatedAt,
                 })
-                .GroupBy(t => t.TransactionDate.Date)               // Group by theo ngày giao dịch .Date để đưa phần giờ về 00:00:00
-                .Select(g => new TransactionsGroupByDateResponse
-                {
-                    DateTime = g.Key,
-                    Transactions = g.ToList()
-                })
-                .OrderByDescending(t => t.DateTime)
                 .ToListAsync();
 
-            return transactions;
+                var groupedTransactions = transactions
+                    .GroupBy(t => t.TransactionDate.Date)
+                    .Select(g => new TransactionsGroupByDateResponse
+                    {
+                        DateTime = g.Key.ToString("yyyy-MM-dd"), //  giờ hợp lệ vì xử lý trong bộ nhớ(không format trực tiếp khi viết linq trong sql)
+                        Transactions = g.ToList()
+                    })
+                    .OrderByDescending(t => t.DateTime)
+                    .ToList();
+
+
+            return groupedTransactions;
         }
     }
 }

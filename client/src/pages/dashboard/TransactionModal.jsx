@@ -45,12 +45,13 @@ const TransactionModal = ({
   categories,
   onAddTransaction,
 }) => {
-  if (!isOpen) return null;
-
+  
   const [txType, setTxType] = useState("expense");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState(categories[0]);
   const [description, setDescription] = useState("");
+  
+  if (!isOpen) return null;
 
   const transactionsForDate = transactions.filter(
     (tx) => tx.date === selectedDate.toISOString().split("T")[0]

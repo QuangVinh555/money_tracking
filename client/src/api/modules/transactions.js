@@ -1,7 +1,7 @@
 import axiosClient from '../axiosClient.js';
 
 const transactionsApi = {
-  getAll: () => axiosClient.get('/transactions'),
+  getAll: () => axiosClient.get('/transactions/get-by-group-date'),
   getById: (id) => axiosClient.get(`/transactions/${id}`),
   create: (data) => axiosClient.post('/transactions', data),
   update: (id, data) => axiosClient.put(`/transactions/${id}`, data),

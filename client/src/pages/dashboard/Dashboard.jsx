@@ -8,34 +8,26 @@ import TransactionModal from "./TransactionModal.jsx";
 import SpendingLimitModal from "./SpendingLimitModal.jsx";
 
 import {
-  ChevronLeft,
-  ChevronRight,
   DollarSign,
   TrendingUp,
   TrendingDown,
   CreditCard,
-  ArrowRight,
-  ShoppingCart,
-  Utensils,
-  Car,
-  Home,
-  LayoutDashboard,
-  Repeat,
-  BarChart3,
-  Wallet,
-  Settings,
-  Gem,
   Download,
-  PlusCircle,
-  Target
+  PlusCircle
 } from "lucide-react";
-import Sidebar from "../../component/layout/Sidebar.jsx";
+import useTransactions from "../../hook/transactions.js";
 
 const Dashboard = () => {
   const { stats } = mockData;
   const balance = stats.budgetLimit - stats.expenses;
 
+  // List data fake transactions
   const [allTransactions, setAllTransactions] = useState(mockData.transactions);
+
+  // List data call API
+  const { transactions } = useTransactions();
+  console.log(transactions)
+
   const [isModalOpen, setModalOpen] = useState(false);
   const [isLimitModalOpen, setLimitModalOpen] = useState(false);
 
@@ -118,7 +110,7 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
             <div className="xl:col-span-2">
               <CalendarView
-                transactions={allTransactions}
+                transactions={transactions}
                 onDayClick={handleDayClick}
               />
             </div>
