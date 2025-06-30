@@ -3,12 +3,26 @@ import transactionsApi from '../api/modules/transactions';
 
 export default function useTransactions() {
   const [transactions, setTransactions] = useState([]);
+  const [totalCard, setTotalCard] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  // Lấy những giao dịch theo tháng được group by theo từng ngày
   const fetchTransactions = async () => {
     try {
       const res = await transactionsApi.getAll();
       setTransactions(res.data);
+    } catch (err) {
+      console.error('Lỗi fetch transactions:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Tính thu nhập chi tiêu các giao dịch trong một tháng
+    const fetchTotalCardTransactions = async () => {
+    try {
+      const res = await transactionsApi.getTotalCard();
+      setTotalCard(res.data);
     } catch (err) {
       console.error('Lỗi fetch transactions:', err);
     } finally {
@@ -35,8 +49,13 @@ export default function useTransactions() {
     fetchTransactions();
   }, []);
 
+  useEffect(() => {
+    fetchTotalCardTransactions();
+  }, [transactions]);
+
   return {
     transactions,
+    totalCard,
     loading,
     createTransactions,
     updateTransactions,

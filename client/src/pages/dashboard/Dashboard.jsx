@@ -19,15 +19,19 @@ import useTransactions from "../../hook/transactions.js";
 import ProfileDropdown from "./ProfileDropdown.jsx";
 
 const Dashboard = () => {
+  // List data fake tổng thu nhập, hạn mức, tổng chi tiêu,...
   const { stats } = mockData;
-  const balance = stats.budgetLimit - stats.expenses;
+  // const balanceFake = stats.budgetLimit - stats.expenses;
 
   // List data fake transactions
   const [allTransactions, setAllTransactions] = useState(mockData.transactions);
 
   // List data call API
-  const { transactions } = useTransactions();
-  console.log(transactions)
+  const { transactions, totalCard } = useTransactions();
+  console.log("transactions", transactions)
+  console.log("totalCard", totalCard)
+
+  // List data call API
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [isLimitModalOpen, setLimitModalOpen] = useState(false);
@@ -97,26 +101,26 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
             <StatCard
               title="Tổng thu nhập"
-              amount={stats.income}
+              amount={totalCard.data?.income || 0}
               icon={<TrendingUp size={24} className="text-green-500" />}
               colorClass="bg-green-100"
             />
             <StatCard
               title="Hạn mức"
-              amount={stats.budgetLimit}
+              amount={totalCard.data?.budgetLimit|| 0}
               icon={<CreditCard size={24} className="text-green-500" />}
               colorClass="bg-green-100"
               onEdit={() => setLimitModalOpen(true)}
             />
             <StatCard
               title="Tổng chi"
-              amount={stats.expenses}
+              amount={totalCard.data?.expense || 0}
               icon={<TrendingDown size={24} className="text-red-500" />}
               colorClass="bg-red-100"
             />
             <StatCard
               title="Số dư"
-              amount={balance}
+              amount={totalCard.data?.balance || 0}
               icon={<DollarSign size={24} className="text-blue-500" />}
               colorClass="bg-blue-100"
             />
