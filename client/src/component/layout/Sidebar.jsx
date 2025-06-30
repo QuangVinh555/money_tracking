@@ -89,7 +89,7 @@ const Sidebar = () => {
       </div>
 
       {/* User Profile */}
-      <div className="flex items-center gap-3 mt-6 border-t pt-6">
+      {/* <div className="flex items-center gap-3 mt-6 border-t pt-6">
         <img
           src="https://placehold.co/40x40/e0e7ff/3730a3?text=A"
           alt="Avatar"
@@ -99,7 +99,7 @@ const Sidebar = () => {
           <p className="font-bold">Quang Vinh</p>
           <p className="text-sm text-gray-500">voquangvinh555@gmail.com</p>
         </div>
-      </div>
+      </div> */}
     </aside>
   );
 };

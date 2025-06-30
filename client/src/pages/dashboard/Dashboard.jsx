@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { mockData } from "../../constants/mock_data.js";
 import StatCard from "../../pages/dashboard/StatCard.jsx";
 import CalendarView from "../../pages/dashboard/CalendarView.jsx";
@@ -16,6 +16,7 @@ import {
   PlusCircle
 } from "lucide-react";
 import useTransactions from "../../hook/transactions.js";
+import ProfileDropdown from "./ProfileDropdown.jsx";
 
 const Dashboard = () => {
   const { stats } = mockData;
@@ -32,6 +33,24 @@ const Dashboard = () => {
   const [isLimitModalOpen, setLimitModalOpen] = useState(false);
 
   const [selectedDate, setSelectedDate] = useState(null);
+
+  const [isProfileOpen, setProfileOpen] = useState(false);
+
+  const profileRef = useRef(null);
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  console.log(isAuthenticated)
+  const handleLogout = () => setIsAuthenticated(false);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [profileRef]);
 
   const handleDayClick = (date) => {
     setSelectedDate(date);
@@ -65,15 +84,12 @@ const Dashboard = () => {
                 Chào mừng trở lại, Vinh! Đây là báo cáo tài chính của bạn.
               </p>
             </div>
-            <div className="flex items-center gap-4">
-              <button className="hidden sm:flex items-center gap-2 bg-white border border-gray-300 text-gray-700 font-semibold px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
-                <Download size={16} />
-                <span>Tải báo cáo</span>
+            <div className="flex items-center gap-4" ref={profileRef}>
+              <button onClick={() => setProfileOpen(p => !p)} className="flex items-center gap-3 p-1 pr-3 rounded-full hover:bg-gray-200 transition-colors">
+                <img src="https://placehold.co/40x40/e0e7ff/3730a3?text=A" alt="Avatar" className="w-10 h-10 rounded-full" />
+                <span className="hidden sm:inline font-semibold text-gray-700">Anh Nguyễn</span>
               </button>
-              <button className="flex items-center gap-2 bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
-                <PlusCircle size={16} />
-                <span>Thêm giao dịch</span>
-              </button>
+              {isProfileOpen && <ProfileDropdown onLogout={handleLogout} />}
             </div>
           </header>
 
