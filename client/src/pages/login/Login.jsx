@@ -1,4 +1,5 @@
 import { GoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 import {
     TrendingUp, BarChart3, Gem
 } from 'lucide-react';
@@ -14,14 +15,14 @@ const Login = () => {
         const idToken = credentialResponse.credential;
         console.log('token', idToken)
         try {
-            // const res = await axios.post('http://localhost:5000/api/auth/google', {
-            //     idToken
-            // });
+            const res = await axios.post(`${import.meta.env.VITE_BASE_API}/api/LoginWithGoogle/google`, {
+                idToken
+            });
 
-            // const { token } = res.data;
+            const { token } = res.data;
 
             // Lưu token hệ thống
-            // localStorage.setItem('token', token);
+            localStorage.setItem('token', token);
             
             navigate('/');
         } catch (err) {
