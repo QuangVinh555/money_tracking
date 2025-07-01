@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import transactionsApi from '../api/modules/transactions';
 
-export default function useTransactions() {
+export default function useTransactions(datetime) {
   const [transactions, setTransactions] = useState([]);
   const [totalCard, setTotalCard] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -9,7 +9,7 @@ export default function useTransactions() {
   // Lấy những giao dịch theo tháng được group by theo từng ngày
   const fetchTransactions = async () => {
     try {
-      const res = await transactionsApi.getAll();
+      const res = await transactionsApi.getAllTransactionsByGroupDate(datetime);
       setTransactions(res.data);
     } catch (err) {
       console.error('Lỗi fetch transactions:', err);
@@ -21,7 +21,7 @@ export default function useTransactions() {
   // Tính thu nhập chi tiêu các giao dịch trong một tháng
     const fetchTotalCardTransactions = async () => {
     try {
-      const res = await transactionsApi.getTotalCard();
+      const res = await transactionsApi.getTotalCard(datetime);
       setTotalCard(res.data);
     } catch (err) {
       console.error('Lỗi fetch transactions:', err);

@@ -17,8 +17,13 @@ import {
 } from "lucide-react";
 import useTransactions from "../../hook/transactions.js";
 import ProfileDropdown from "./ProfileDropdown.jsx";
+import { useNavigate } from "react-router-dom";
+import { formatToUTCDateString } from "../../utils/format.js";
 
 const Dashboard = () => {
+    // State lưu giá trị datetime (click tháng trước, tháng sau) truyền component con sang component cha
+  const [changeDate, setChangeDate] = useState(formatToUTCDateString(new Date()));
+
   // List data fake tổng thu nhập, hạn mức, tổng chi tiêu,...
   const { stats } = mockData;
   // const balanceFake = stats.budgetLimit - stats.expenses;
@@ -27,11 +32,13 @@ const Dashboard = () => {
   const [allTransactions, setAllTransactions] = useState(mockData.transactions);
 
   // List data call API
-  const { transactions, totalCard } = useTransactions();
+  const { transactions, totalCard } = useTransactions(changeDate);
   console.log("transactions", transactions)
   console.log("totalCard", totalCard)
 
   // List data call API
+
+
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [isLimitModalOpen, setLimitModalOpen] = useState(false);
@@ -42,9 +49,16 @@ const Dashboard = () => {
 
   const profileRef = useRef(null);
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  console.log(isAuthenticated)
-  const handleLogout = () => setIsAuthenticated(false);
+  const navigate = useNavigate();
+  const handleLogOut = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  }
+
+  // Truyền datetime từ component con lên component cha
+  const handleDateChange = (date) => {
+    setChangeDate(formatToUTCDateString(date));
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -93,7 +107,7 @@ const Dashboard = () => {
                 <img src="https://placehold.co/40x40/e0e7ff/3730a3?text=A" alt="Avatar" className="w-10 h-10 rounded-full" />
                 <span className="hidden sm:inline font-semibold text-gray-700">Anh Nguyễn</span>
               </button>
-              {isProfileOpen && <ProfileDropdown onLogout={handleLogout} />}
+              {isProfileOpen && <ProfileDropdown onLogout={handleLogOut} />}
             </div>
           </header>
 
@@ -107,7 +121,7 @@ const Dashboard = () => {
             />
             <StatCard
               title="Hạn mức"
-              amount={totalCard.data?.budgetLimit|| 0}
+              amount={totalCard.data?.budgetLimit || 0}
               icon={<CreditCard size={24} className="text-green-500" />}
               colorClass="bg-green-100"
               onEdit={() => setLimitModalOpen(true)}
@@ -131,6 +145,7 @@ const Dashboard = () => {
             <div className="xl:col-span-2">
               <CalendarView
                 transactions={transactions}
+                onChangeDate={handleDateChange}
                 onDayClick={handleDayClick}
               />
             </div>

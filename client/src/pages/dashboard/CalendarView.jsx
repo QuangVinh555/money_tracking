@@ -1,14 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatCurrency, formatToLocalDateString } from "../../utils/format";
 formatCurrency
 import { TRANSACTIONS_TYPE } from "../../constants/common";
 
-const CalendarView = ({ transactions, onDayClick }) => {
+const CalendarView = ({ transactions, onChangeDate, onDayClick }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
 
     // Khi chuyển tháng kế tiếp hay tháng trước đó thì sẽ cập nhật lại tháng đó thành ngày 1
     const changeMonth = (amount) => setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + amount, 1));
+
+    // Gọi onChangeDate mỗi khi currentDate thay đổi
+    useEffect(() => {
+        if (onChangeDate) {
+            onChangeDate(currentDate);
+        }
+    }, [currentDate]);
 
     // Nếu ngày hiện tại không phải là ngày đầu tháng thì chuyển về ngày 1(đầu tháng)
     const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
