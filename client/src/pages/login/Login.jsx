@@ -1,3 +1,4 @@
+import { GoogleLogin } from '@react-oauth/google';
 import {
     TrendingUp, BarChart3, Gem
 } from 'lucide-react';
@@ -8,6 +9,25 @@ const Login = () => {
         localStorage.setItem('token', '123test')
         navigate('/');
     }
+
+    const handleSuccess = async (credentialResponse) => {
+        const idToken = credentialResponse.credential;
+        console.log('token', idToken)
+        try {
+            // const res = await axios.post('http://localhost:5000/api/auth/google', {
+            //     idToken
+            // });
+
+            // const { token } = res.data;
+
+            // Lưu token hệ thống
+            // localStorage.setItem('token', token);
+            
+            navigate('/');
+        } catch (err) {
+            console.error('Đăng nhập thất bại:', err);
+        }
+    };
 
     return (
         <>
@@ -90,10 +110,12 @@ const Login = () => {
                         </div>
                     </div>
                     <div className="space-y-4 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-                        <button onClick={handleLogin} className="w-full flex items-center justify-center py-3 px-4 bg-white border border-gray-300 rounded-xl text-gray-700 font-semibold btn-hover hover:border-gray-400 hover:bg-gray-50">
-                            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_24dp.png" alt="Google logo" className="w-5 h-5 mr-3" />
-                            Đăng nhập với Google
-                        </button>
+                        <GoogleLogin
+                            onSuccess={handleSuccess}
+                            onError={() => {
+                                console.log('Login Failed');
+                            }}
+                        />
                         <button onClick={handleLogin} className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-xl btn-hover">
                             Trải nghiệm bản Demo
                         </button>
