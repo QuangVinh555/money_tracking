@@ -47,7 +47,7 @@ export default function useTransactions(datetime) {
 
   useEffect(() => {
     fetchTransactions();
-  }, []);
+  }, [datetime]);
 
   useEffect(() => {
     fetchTotalCardTransactions();

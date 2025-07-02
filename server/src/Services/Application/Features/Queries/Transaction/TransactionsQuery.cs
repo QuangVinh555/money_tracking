@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Application.Common.CurrentUser;
 using Application.Features.DTOs.Transactions;
 using Core.Constanst;
 using Core.Extensions;
@@ -43,9 +44,11 @@ namespace Application.Features.Queries.Transaction
     public class TransactionsQuery : ITransactionQuery
     {
         private readonly AppDbContext _context;
+        private readonly ICurrentUserService _currentUser;
 
-        public TransactionsQuery(AppDbContext context) {
+        public TransactionsQuery(AppDbContext context, ICurrentUserService currentUser) {
             _context = context;
+            _currentUser = currentUser;
         }
         public async Task<List<TransactionsResponse>> GetAllTransactionsByCurrentMonth()
         {
@@ -149,7 +152,8 @@ namespace Application.Features.Queries.Transaction
 
         public async Task<List<TransactionsGroupByDateResponse>> GetTransactionsGroupByDate(DateTime? OptionDate)
         {
-            
+            var userId = _currentUser.UserId;
+
             // Lấy ngày hiện tại
             var now = DateTime.UtcNow;
 
@@ -167,7 +171,11 @@ namespace Application.Features.Queries.Transaction
                 : DateTimeExtensions.ToUtcEndOfMonth(now);
 
             var transactions = await _context.Transactions
-                .Where(t => t.TransactionDate >= firstDayOfMonth && t.TransactionDate < firstDayOfNextMonth && t.Actived == true)
+                .Where(t => t.TransactionDate >= firstDayOfMonth 
+                    && t.TransactionDate < firstDayOfNextMonth 
+                    && t.UserId == userId
+                    && t.Actived == true
+                )
                 .Include(t => t.User)
                 .Include(t => t.Category)
                 .Select(t => new TransactionsResponse

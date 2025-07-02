@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 const Login = () => {
     const navigate = useNavigate()
     const handleLogin = () => {
-        localStorage.setItem('token', '123test')
+        localStorage.setItem('access_token', '123test')
         navigate('/');
     }
 
@@ -22,7 +22,7 @@ const Login = () => {
             const { token } = res.data;
 
             // Lưu token hệ thống
-            localStorage.setItem('token', token);
+            localStorage.setItem('access_token', token);
             
             navigate('/');
         } catch (err) {

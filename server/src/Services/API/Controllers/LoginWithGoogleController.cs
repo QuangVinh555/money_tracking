@@ -83,6 +83,7 @@ namespace server.Controllers
 
                 return Ok(new
                 {
+                    UserInfo = claims,
                     token = new JwtSecurityTokenHandler().WriteToken(token)
                 });
             }

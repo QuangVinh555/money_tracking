@@ -1,9 +1,11 @@
-﻿using Application.Features.Commands.Transactions;
+﻿using Application.Common.CurrentUser;
+using Application.Features.Commands.Transactions;
 using Application.Features.DTOs.Transactions;
 using Application.Features.Queries.Transaction;
 using Core.Common;
 using Infrastructure.Models;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +13,7 @@ namespace server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TransactionsController : ControllerBase
     {
         private readonly AppDbContext _context;

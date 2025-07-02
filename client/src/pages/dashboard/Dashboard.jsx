@@ -18,10 +18,10 @@ import {
 import useTransactions from "../../hook/transactions.js";
 import ProfileDropdown from "./ProfileDropdown.jsx";
 import { useNavigate } from "react-router-dom";
-import { formatToUTCDateString } from "../../utils/format.js";
+import { formatToLocalDateString, formatToUTCDateString } from "../../utils/format.js";
 
 const Dashboard = () => {
-    // State lưu giá trị datetime (click tháng trước, tháng sau) truyền component con sang component cha
+  // State lưu giá trị datetime (click tháng trước, tháng sau) truyền component con sang component cha
   const [changeDate, setChangeDate] = useState(formatToUTCDateString(new Date()));
 
   // List data fake tổng thu nhập, hạn mức, tổng chi tiêu,...
@@ -51,13 +51,17 @@ const Dashboard = () => {
 
   const navigate = useNavigate();
   const handleLogOut = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('access_token');
     navigate('/login');
   }
 
-  // Truyền datetime từ component con lên component cha
+  /* 
+    Truyền datetime từ component con lên component cha
+    Đã note trường hợp này trong componet CalendarView
+    Sẽ convert dang thứ ngày tiếng anh sang theo chuẩn "YYYY-MM-DD"
+  */
   const handleDateChange = (date) => {
-    setChangeDate(formatToUTCDateString(date));
+    setChangeDate(formatToLocalDateString(date));
   };
 
   useEffect(() => {

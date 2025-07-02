@@ -10,7 +10,11 @@ const CalendarView = ({ transactions, onChangeDate, onDayClick }) => {
     // Khi chuyển tháng kế tiếp hay tháng trước đó thì sẽ cập nhật lại tháng đó thành ngày 1
     const changeMonth = (amount) => setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + amount, 1));
 
-    // Gọi onChangeDate mỗi khi currentDate thay đổi
+    /* 
+        Gọi onChangeDate mỗi khi currentDate thay đổi
+        Vì chỗ này đang mặc định lúc nào cũng lấy ngày 1 nên nếu chuyển sang kiểu UTC thì sẽ bị sai(nó dời qua tháng 5)
+        Và nó cũng chỉ là chủ yếu để check tháng năm nên giữ nguyên kiểu hệ thống sẽ không ảnh hưởng(không thể chênh lệch 1 tháng giữa kiểu UTC và local)
+    */
     useEffect(() => {
         if (onChangeDate) {
             onChangeDate(currentDate);
