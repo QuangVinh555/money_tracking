@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Application.Common.CurrentUser;
 using Core.Common;
 using Core.Extensions;
 using Infrastructure.Models;
@@ -12,7 +13,6 @@ namespace Application.Features.Commands.Transactions
 {
     public class CreateTransactionsCommand : IRequest<ApiResponse<bool>>
     {
-        public int UserId { get; set; }
         public int CategoryId { get; set; }
         public decimal Amount { get; set; }
         public DateTime Transaction_Date { get; set; }
@@ -25,10 +25,12 @@ namespace Application.Features.Commands.Transactions
     public class CreateTransactionsCommandHandler : IRequestHandler<CreateTransactionsCommand, ApiResponse<bool>>
     {
         private readonly AppDbContext _context;
+        private readonly ICurrentUserService _currentUserService;
 
-        public CreateTransactionsCommandHandler(AppDbContext context ) 
+        public CreateTransactionsCommandHandler(AppDbContext context, ICurrentUserService currentUserService ) 
         {
             _context = context;
+            _currentUserService = currentUserService;
         }
         public async Task<ApiResponse<bool>> Handle(CreateTransactionsCommand request, CancellationToken cancellationToken)
         {
@@ -48,7 +50,7 @@ namespace Application.Features.Commands.Transactions
 
                 var transaction = new Transaction
                 {
-                    UserId = request.UserId,
+                    UserId = _currentUserService.UserId,
                     CategoryId = request.CategoryId,
                     Description = request.Description,
                     Amount = request.Amount,

@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using Application.Common.CurrentUser;
+using Application.Features.Queries.Category;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,7 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(Cre
 
 // Cấu hình Query
 builder.Services.AddScoped<ITransactionQuery, TransactionsQuery>();
+builder.Services.AddScoped<ICategoriesQuery, CategoriesQuery>();
 
 // Cấu hình service get current userId
 builder.Services.AddHttpContextAccessor();

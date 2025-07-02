@@ -10,12 +10,12 @@ namespace Application.Common.CurrentUser
 {
     public interface ICurrentUserService
     {
-        int? UserId { get; }
+        int UserId { get; }
     }
 
     public class CurrentUserService : ICurrentUserService
     {
-        public int? UserId { get; }
+        public int UserId { get; }
 
         public CurrentUserService(IHttpContextAccessor httpContextAccessor)
         {

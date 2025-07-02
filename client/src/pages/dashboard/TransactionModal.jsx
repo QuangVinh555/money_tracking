@@ -1,30 +1,14 @@
 import { useState } from "react";
-import { formatCurrency, formatDate } from "../../utils/format";
+import { formatCurrency, formatDate, formatToLocalDateString } from "../../utils/format";
 import {
-  ChevronLeft,
-  ChevronRight,
   DollarSign,
-  TrendingUp,
-  TrendingDown,
-  ArrowRight,
   ShoppingCart,
   Utensils,
   Car,
   Home,
-  LayoutDashboard,
-  Repeat,
-  BarChart3,
-  Wallet,
-  Settings,
-  Gem,
-  Target,
-  PlusCircle,
-  Download,
-  X,
-  List,
-  Tag,
-  Type,
+  X
 } from "lucide-react";
+import { TRANSACTIONS_TYPE } from "../../constants/common";
 
 // --- ICON MAPPING ---
 const categoryIcons = {
@@ -32,8 +16,8 @@ const categoryIcons = {
   "Mua sắm": <ShoppingCart size={20} className="text-blue-500" />,
   "Di chuyển": <Car size={20} className="text-green-500" />,
   "Nhà cửa": <Home size={20} className="text-purple-500" />,
-  Lương: <DollarSign size={20} className="text-emerald-500" />,
-  Default: <DollarSign size={20} className="text-gray-500" />,
+  "Lương": <DollarSign size={20} className="text-emerald-500" />,
+  "Default": <DollarSign size={20} className="text-gray-500" />,
 };
 const getCategoryIcon = (category) =>
   categoryIcons[category] || categoryIcons["Default"];
@@ -45,16 +29,20 @@ const TransactionModal = ({
   categories,
   onAddTransaction,
 }) => {
-  
-  const [txType, setTxType] = useState("expense");
+  // State quản lý loại giao dịch (1: thu nhập, 2: chi tiêu)
+  const [txType, setTxType] = useState(TRANSACTIONS_TYPE.EXPENSE);
   const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState(categories[0]);
+  // State quản lý danh mục giao dịch
+  const [category, setCategory] = useState(1); // Mặc định số 1: danh mục ăn uống
   const [description, setDescription] = useState("");
   
   if (!isOpen) return null;
 
   const transactionsForDate = transactions.filter(
-    (tx) => tx.date === selectedDate.toISOString().split("T")[0]
+    (tx) => { 
+      console.log("transactionsForDate", tx.date)
+      return (tx.date === selectedDate.toISOString().split("T")[0])
+    }
   );
   const dailyTotal = transactionsForDate.reduce(
     (acc, tx) => {
@@ -68,13 +56,14 @@ const TransactionModal = ({
   const handleSubmit = (e) => {
     e.preventDefault();
     const newTransaction = {
-      id: Date.now(),
-      type: txType,
-      category,
-      description,
+      categoryId: category,
       amount: parseInt(amount, 10),
-      date: selectedDate.toISOString().split("T")[0],
+      // Nếu gửi không kèm giờ thì nên gửi thằng dạng "YYYY-MM-DD", nếu kèm giờ phút giây thì phải convert sang UTC
+      transaction_Date: formatToLocalDateString(selectedDate),
+      transaction_Type: txType,
+      description,
     };
+    console.log(newTransaction)
     onAddTransaction(newTransaction);
     // Reset form
     setAmount("");
@@ -126,8 +115,8 @@ const TransactionModal = ({
               <div className="flex gap-4">
                 <button
                   type="button"
-                  onClick={() => setTxType("expense")}
-                  className={`flex-1 py-2 rounded-lg font-semibold transition-colors ${txType === "expense"
+                  onClick={() => setTxType(TRANSACTIONS_TYPE.EXPENSE)}
+                  className={`flex-1 py-2 rounded-lg font-semibold transition-colors ${txType === TRANSACTIONS_TYPE.EXPENSE
                       ? "bg-red-500 text-white"
                       : "bg-gray-200"
                     }`}
@@ -136,8 +125,8 @@ const TransactionModal = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setTxType("income")}
-                  className={`flex-1 py-2 rounded-lg font-semibold transition-colors ${txType === "income"
+                  onClick={() => setTxType(TRANSACTIONS_TYPE.INCOME)}
+                  className={`flex-1 py-2 rounded-lg font-semibold transition-colors ${txType === TRANSACTIONS_TYPE.INCOME
                       ? "bg-green-500 text-white"
                       : "bg-gray-200"
                     }`}
@@ -151,9 +140,9 @@ const TransactionModal = ({
                   onChange={(e) => setCategory(e.target.value)}
                   className="w-full p-2 border rounded-lg bg-white"
                 >
-                  {categories.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
+                  {categories?.data.map((c) => (
+                    <option key={c.categoryId} value={c.categoryId}>
+                      {c.categoryName}
                     </option>
                   ))}
                 </select>

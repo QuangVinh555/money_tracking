@@ -7,7 +7,7 @@ const ProfileDropdown = ({onLogout}) => {
                 <div className="flex items-center gap-3 px-3 py-2">
                     <img src="https://placehold.co/40x40/e0e7ff/3730a3?text=A" alt="Avatar" className="w-10 h-10 rounded-full" />
                     <div>
-                        <p className="font-bold text-gray-800">Anh Nguyễn</p>
+                        <p className="font-bold text-gray-800">Quang Vinh</p>
                         <p className="text-sm text-gray-500">Người dùng Pro</p>
                     </div>
                 </div>

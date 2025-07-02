@@ -19,9 +19,10 @@ import useTransactions from "../../hook/transactions.js";
 import ProfileDropdown from "./ProfileDropdown.jsx";
 import { useNavigate } from "react-router-dom";
 import { formatToLocalDateString, formatToUTCDateString } from "../../utils/format.js";
+import useCategories from "../../hook/categories.js";
 
 const Dashboard = () => {
-  // State lưu giá trị datetime (click tháng trước, tháng sau) truyền component con sang component cha
+  // State lưu giá trị datetime (click tháng trước, tháng sau) truyền component con(CalendarView) sang component cha
   const [changeDate, setChangeDate] = useState(formatToUTCDateString(new Date()));
 
   // List data fake tổng thu nhập, hạn mức, tổng chi tiêu,...
@@ -31,14 +32,11 @@ const Dashboard = () => {
   // List data fake transactions
   const [allTransactions, setAllTransactions] = useState(mockData.transactions);
 
-  // List data call API
-  const { transactions, totalCard } = useTransactions(changeDate);
-  console.log("transactions", transactions)
-  console.log("totalCard", totalCard)
+  // List data transactions call API
+  const { transactions, totalCard, createTransactions } = useTransactions(changeDate);
 
-  // List data call API
-
-
+  // List data categories call API
+  const {categories} = useCategories();
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [isLimitModalOpen, setLimitModalOpen] = useState(false);
@@ -79,12 +77,9 @@ const Dashboard = () => {
     setModalOpen(true);
   };
 
+  // Thêm giao dịch transactions
   const handleAddTransaction = (newTransaction) => {
-    setAllTransactions((prev) =>
-      [...prev, newTransaction].sort(
-        (a, b) => new Date(b.date) - new Date(a.date)
-      )
-    );
+    createTransactions(newTransaction);
   };
 
   const handleSetLimit = (newLimit) => {
@@ -109,7 +104,7 @@ const Dashboard = () => {
             <div className="flex items-center gap-4" ref={profileRef}>
               <button onClick={() => setProfileOpen(p => !p)} className="flex items-center gap-3 p-1 pr-3 rounded-full hover:bg-gray-200 transition-colors">
                 <img src="https://placehold.co/40x40/e0e7ff/3730a3?text=A" alt="Avatar" className="w-10 h-10 rounded-full" />
-                <span className="hidden sm:inline font-semibold text-gray-700">Anh Nguyễn</span>
+                <span className="hidden sm:inline font-semibold text-gray-700">Quang Vinh</span>
               </button>
               {isProfileOpen && <ProfileDropdown onLogout={handleLogOut} />}
             </div>
@@ -165,7 +160,7 @@ const Dashboard = () => {
         onClose={() => setModalOpen(false)}
         selectedDate={selectedDate}
         transactions={allTransactions}
-        categories={mockData.categories}
+        categories={categories}
         onAddTransaction={handleAddTransaction}
       />
       <SpendingLimitModal isOpen={isLimitModalOpen} onClose={() => setLimitModalOpen(false)} currentLimit={stats.spendingLimit} onSetLimit={handleSetLimit} />
