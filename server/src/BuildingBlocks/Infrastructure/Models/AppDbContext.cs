@@ -170,6 +170,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Fullname)
                 .HasMaxLength(100)
                 .HasColumnName("fullname");
+            entity.Property(e => e.LastLoginAt).HasColumnName("last_login_at");
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnName("updated_at");

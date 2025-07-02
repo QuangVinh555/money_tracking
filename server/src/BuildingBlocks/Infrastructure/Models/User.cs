@@ -21,6 +21,8 @@ public partial class User
 
     public DateTime? DeletedAt { get; set; }
 
+    public DateTime? LastLoginAt { get; set; }
+
     public virtual ICollection<Budget> Budgets { get; set; } = new List<Budget>();
 
     public virtual ICollection<BudgetsLimit> BudgetsLimits { get; set; } = new List<BudgetsLimit>();
