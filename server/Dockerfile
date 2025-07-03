@@ -4,6 +4,9 @@ WORKDIR /app
 # Copy toàn bộ source code
 COPY server/src/ ./server/src/
 
+# Debug: Liệt kê file trong thư mục dự án
+RUN echo "DEBUG: Listing src/Services/API" && ls -la ./src/Services/API
+
 # Restore, build, publish dựa trên đúng đường dẫn vật lý
 RUN dotnet restore ./server/src/Services/API/server.csproj
 RUN dotnet build ./server/src/Services/API/server.csproj -f net8.0
