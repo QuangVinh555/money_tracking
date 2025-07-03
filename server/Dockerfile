@@ -5,7 +5,7 @@ WORKDIR /app
 COPY src/ ./server/src/
 
 # Debug: Liệt kê file trong thư mục dự án
-RUN echo "DEBUG: Listing src/Services/API" && ls -la ./src/Services/API
+RUN echo "DEBUG: Listing server/src/Services/API" && ls -la ./server/src/Services/API
 
 # Restore, build, publish dựa trên đúng đường dẫn vật lý
 RUN dotnet restore ./server/src/Services/API/server.csproj
