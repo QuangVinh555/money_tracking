@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
 # Copy toàn bộ source code
-COPY server/src/ ./server/src/
+COPY src/ ./server/src/
 
 # Debug: Liệt kê file trong thư mục dự án
 RUN echo "DEBUG: Listing src/Services/API" && ls -la ./src/Services/API
