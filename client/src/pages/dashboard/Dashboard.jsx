@@ -30,7 +30,7 @@ const Dashboard = () => {
   // const balanceFake = stats.budgetLimit - stats.expenses;
 
   // List data fake transactions
-  const [allTransactions, setAllTransactions] = useState(mockData.transactions);
+  // const [allTransactions, setAllTransactions] = useState(mockData.transactions);
 
   // List data transactions call API
   const { transactions, totalCard, createTransactions } = useTransactions(changeDate);
@@ -84,8 +84,13 @@ const Dashboard = () => {
     createTransactions(newTransaction);
   };
 
-  const handleSetLimit = (newLimit) => {
-    setAllTransactions(prev => ({ ...prev, stats: { ...prev.stats, spendingLimit: newLimit } }));
+  // COmment lại
+  // const handleSetLimit = (newLimit) => {
+  //   setAllTransactions(prev => ({ ...prev, stats: { ...prev.stats, spendingLimit: newLimit } }));
+  //   setLimitModalOpen(false);
+  // };
+  // Để lại hàm này cho khỏi lỗi(để hôm sau xử lý)
+  const handleSetLimit = () => {
     setLimitModalOpen(false);
   };
 
@@ -151,7 +156,7 @@ const Dashboard = () => {
               />
             </div>
             <div className="space-y-6">
-              <RecentTransactions transactions={allTransactions} />
+              <RecentTransactions transactions={transactions} />
               {/* <ExpensePieChart data={expenseByCategory} /> */}
             </div>
           </div>
