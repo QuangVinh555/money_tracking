@@ -7,7 +7,7 @@ public partial class Category
 {
     public int CategoryId { get; set; }
 
-    public string CategoryName { get; set; } = null!;
+    public string? CategoryName { get; set; }
 
     public bool? Actived { get; set; }
 
@@ -16,8 +16,4 @@ public partial class Category
     public DateTime? UpdatedAt { get; set; }
 
     public DateTime? DeletedAt { get; set; }
-
-    public virtual ICollection<Budget> Budgets { get; set; } = new List<Budget>();
-
-    public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 }

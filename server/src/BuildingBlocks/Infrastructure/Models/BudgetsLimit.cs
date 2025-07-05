@@ -9,9 +9,9 @@ public partial class BudgetsLimit
 
     public int UserId { get; set; }
 
-    public DateTime? BudgetsLimitStartDate { get; set; }
+    public DateOnly? BudgetsLimitStartDate { get; set; }
 
-    public DateTime? BudgetsLimitEndDate { get; set; }
+    public DateOnly? BudgetsLimitEndDate { get; set; }
 
     public decimal? BudgetsLimitTotal { get; set; }
 
@@ -22,6 +22,4 @@ public partial class BudgetsLimit
     public DateTime? UpdatedAt { get; set; }
 
     public DateTime? DeletedAt { get; set; }
-
-    public virtual User User { get; set; } = null!;
 }

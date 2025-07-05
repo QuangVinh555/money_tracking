@@ -11,9 +11,9 @@ public partial class Transaction
 
     public int CategoryId { get; set; }
 
-    public decimal Amount { get; set; }
+    public decimal? Amount { get; set; }
 
-    public DateTime TransactionDate { get; set; }
+    public DateOnly TransactionDate { get; set; }
 
     public bool? Actived { get; set; }
 
@@ -26,8 +26,4 @@ public partial class Transaction
     public int? TransactionType { get; set; }
 
     public string? Description { get; set; }
-
-    public virtual Category Category { get; set; } = null!;
-
-    public virtual User User { get; set; } = null!;
 }
