@@ -72,7 +72,7 @@ namespace Application.Features.Queries.Transaction
 
             // Hạn mức (Lấy ngày đầu tiên của tháng để so sánh với cột ngày đầu tiên của hạn mức)
             var budgetLimit = await _context.BudgetsLimits
-                .Where(b => b.BudgetsLimitStartDate != null && b.BudgetsLimitStartDate.Value == fromDate)
+                .Where(b => b.BudgetsLimitStartDate != null && b.BudgetsLimitStartDate.Value == fromDate && b.UserId == userId)
                 .FirstOrDefaultAsync();
 
             return new TransactionsTotalCardResponse

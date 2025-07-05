@@ -27,6 +27,7 @@ const TransactionModal = ({
   selectedDate,
   transactions,
   categories,
+  totalCard,
   onAddTransaction,
 }) => {
   // State quản lý loại giao dịch (1: thu nhập, 2: chi tiêu)
@@ -37,21 +38,16 @@ const TransactionModal = ({
   const [description, setDescription] = useState("");
   
   if (!isOpen) return null;
+  console.log("transactions", transactions.data)
+  console.log("selectedDate", selectedDate)
 
-  const transactionsForDate = transactions.filter(
+  const transactionsForDate = transactions.data?.filter(
     (tx) => { 
-      console.log("transactionsForDate", tx.date)
-      return (tx.date === selectedDate.toISOString().split("T")[0])
+      return (tx.dateTime === formatToLocalDateString(selectedDate))
     }
   );
-  const dailyTotal = transactionsForDate.reduce(
-    (acc, tx) => {
-      if (tx.type === "income") acc.income += tx.amount;
-      else acc.expense += tx.amount;
-      return acc;
-    },
-    { income: 0, expense: 0 }
-  );
+  console.log("transactionsForDate", transactionsForDate)
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -101,13 +97,13 @@ const TransactionModal = ({
             <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
               <p className="text-sm text-green-700">Tổng thu</p>
               <p className="text-lg font-bold text-green-600">
-                {formatCurrency(dailyTotal.income)}
+                {formatCurrency(totalCard.data?.income)}
               </p>
             </div>
             <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
               <p className="text-sm text-red-700">Tổng chi</p>
               <p className="text-lg font-bold text-red-600">
-                {formatCurrency(dailyTotal.expense)}
+                {formatCurrency(totalCard.data?.expense)}
               </p>
             </div>
           </div>
@@ -183,13 +179,13 @@ const TransactionModal = ({
             </h3>
             <div className="space-y-3">
               {transactionsForDate.length > 0 ? (
-                transactionsForDate.map((tx) => (
+                transactionsForDate[0]?.transactions.map((tx,i) => (
                   <div
-                    key={tx.id}
-                    className="flex items-center bg-white p-3 rounded-lg border"
+                  key={i}
+                  className="flex items-center bg-white p-3 rounded-lg border"
                   >
                     <div className="p-2 bg-gray-100 rounded-full mr-3">
-                      {getCategoryIcon(tx.category)}
+                      {getCategoryIcon(tx.categoryName)}
                     </div>
                     <div className="flex-grow">
                       <p className="font-semibold">{tx.description}</p>

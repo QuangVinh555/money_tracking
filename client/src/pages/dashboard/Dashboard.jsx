@@ -18,12 +18,12 @@ import {
 import useTransactions from "../../hook/transactions.js";
 import ProfileDropdown from "./ProfileDropdown.jsx";
 import { useNavigate } from "react-router-dom";
-import { formatToLocalDateString, formatToUTCDateString } from "../../utils/format.js";
+import { formatToLocalDateString } from "../../utils/format.js";
 import useCategories from "../../hook/categories.js";
 
 const Dashboard = () => {
   // State lưu giá trị datetime (click tháng trước, tháng sau) truyền component con(CalendarView) sang component cha
-  const [changeDate, setChangeDate] = useState(formatToUTCDateString(new Date()));
+  const [changeDate, setChangeDate] = useState(formatToLocalDateString(new Date()));
 
   // List data fake tổng thu nhập, hạn mức, tổng chi tiêu,...
   const { stats } = mockData;
@@ -36,7 +36,7 @@ const Dashboard = () => {
   const { transactions, totalCard, createTransactions } = useTransactions(changeDate);
 
   // List data categories call API
-  const {categories} = useCategories();
+  const { categories } = useCategories();
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [isLimitModalOpen, setLimitModalOpen] = useState(false);
@@ -72,6 +72,8 @@ const Dashboard = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [profileRef]);
 
+  // Vì ở componetn TransactionModal đang dùng hàm format để chuyển sang dạng khác nên chỗ này sẽ giữ nguyên
+  // Và sẽ xử lý formatToLocalDateString nó ở TransactionModal
   const handleDayClick = (date) => {
     setSelectedDate(date);
     setModalOpen(true);
@@ -113,17 +115,17 @@ const Dashboard = () => {
           {/* Stat Cards Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
             <StatCard
-              title="Tổng thu nhập"
-              amount={totalCard.data?.income || 0}
-              icon={<TrendingUp size={24} className="text-green-500" />}
-              colorClass="bg-green-100"
-            />
-            <StatCard
               title="Hạn mức"
               amount={totalCard.data?.budgetLimit || 0}
               icon={<CreditCard size={24} className="text-green-500" />}
               colorClass="bg-green-100"
               onEdit={() => setLimitModalOpen(true)}
+            />
+            <StatCard
+              title="Tổng thu nhập"
+              amount={totalCard.data?.income || 0}
+              icon={<TrendingUp size={24} className="text-green-500" />}
+              colorClass="bg-green-100"
             />
             <StatCard
               title="Tổng chi"
@@ -159,8 +161,9 @@ const Dashboard = () => {
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         selectedDate={selectedDate}
-        transactions={allTransactions}
+        transactions={transactions}
         categories={categories}
+        totalCard={totalCard}
         onAddTransaction={handleAddTransaction}
       />
       <SpendingLimitModal isOpen={isLimitModalOpen} onClose={() => setLimitModalOpen(false)} currentLimit={stats.spendingLimit} onSetLimit={handleSetLimit} />
