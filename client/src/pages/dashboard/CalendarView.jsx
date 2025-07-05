@@ -63,8 +63,10 @@ const CalendarView = ({ transactions, onChangeDate, onDayClick }) => {
             </div>
             <div className="grid grid-cols-7 gap-2 mt-2">
                 {days.map((day, i) => {
-                    // Đưa từng ngày về kiểu ngày local của hệ thống vì datetime của api 
-                    // cũng chỉ trả ra ngày làm key nên không sợ nhầm ngày giờ của UTC và của hệ thống
+                    /* 
+                        Đưa từng ngày về kiểu ngày local của hệ thống vì datetime của api 
+                        cũng chỉ trả ra ngày làm key nên không sợ nhầm ngày giờ của UTC và của hệ thống
+                    */
                     const dateDay = formatToLocalDateString(day);
 
                     // Tìm nhóm giao dịch trong mảng có dateTime trùng với ngày hiện tại

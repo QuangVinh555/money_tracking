@@ -45,8 +45,8 @@ namespace Application.Features.Commands.Transactions
                     });
                 }
 
-                // Ép kiểu về UTC
-                var transactionDate = DateTimeExtensions.EnsureUtc(request.Transaction_Date);
+                // Ép kiểu về UTC(Sủa lại đoạn này không cần convert về UTC nữa vì Db chủ lưu "YYYY-MM-DD") thôi
+                //var transactionDate = DateTimeExtensions.EnsureUtc(request.Transaction_Date);
 
                 var transaction = new Transaction
                 {
@@ -54,7 +54,7 @@ namespace Application.Features.Commands.Transactions
                     CategoryId = request.CategoryId,
                     Description = request.Description,
                     Amount = request.Amount,
-                    TransactionDate = transactionDate,
+                    TransactionDate = request.Transaction_Date,
                     TransactionType = request.Transaction_Type,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
