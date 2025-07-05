@@ -22,4 +22,6 @@ public partial class User
     public DateTime? DeletedAt { get; set; }
 
     public DateTime? LastLoginAt { get; set; }
+
+    public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 }
