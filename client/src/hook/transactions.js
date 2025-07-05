@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import transactionsApi from '../api/modules/transactions';
 
-export default function useTransactions(datetime) {
+export default function useTransactions(datetime, isLimitModalOpen) {
   const [transactions, setTransactions] = useState([]);
   const [totalCard, setTotalCard] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -51,7 +51,7 @@ export default function useTransactions(datetime) {
 
   useEffect(() => {
     fetchTotalCardTransactions();
-  }, [transactions]);
+  }, [transactions, isLimitModalOpen]);
 
   return {
     transactions,

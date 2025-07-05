@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     X
 } from 'lucide-react';
@@ -6,12 +6,19 @@ import {
 import { formatCurrency } from "../../utils/format";
 const SpendingLimitModal = ({ isOpen, onClose, currentLimit, onSetLimit }) => {
     if (!isOpen) return null;
+
     const [limit, setLimit] = useState(currentLimit);
+    
+    // Hạn mức mặc định
     const suggestions = [5000000, 10000000, 15000000, 20000000];
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSetLimit(Number(limit));
+        var newLimit = {
+            Budgets_Limit_Total: Number(limit)
+        }
+        onSetLimit(newLimit);
     };
+
     return (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 animate-fade-in">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm flex flex-col animate-scale-up">

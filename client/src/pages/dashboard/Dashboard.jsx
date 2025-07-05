@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { mockData } from "../../constants/mock_data.js";
 import StatCard from "../../pages/dashboard/StatCard.jsx";
 import CalendarView from "../../pages/dashboard/CalendarView.jsx";
 import ExpensePieChart from "../../pages/dashboard/ExpensePieChart.jsx";
@@ -20,34 +19,41 @@ import ProfileDropdown from "./ProfileDropdown.jsx";
 import { useNavigate } from "react-router-dom";
 import { formatToLocalDateString } from "../../utils/format.js";
 import useCategories from "../../hook/categories.js";
+import useBudgetsLimit from "../../hook/budgets_limit.js";
 
 const Dashboard = () => {
   // State lưu giá trị datetime (click tháng trước, tháng sau) truyền component con(CalendarView) sang component cha
   const [changeDate, setChangeDate] = useState(formatToLocalDateString(new Date()));
 
-  // List data fake tổng thu nhập, hạn mức, tổng chi tiêu,...
-  const { stats } = mockData;
-  // const balanceFake = stats.budgetLimit - stats.expenses;
+  // State lưu sự thay đổi của hạn mức để call API dựa vào giá trị này mà load lại data
+  // const[changeLimit, setChangeLimit] = useState(0);
 
-  // List data fake transactions
-  // const [allTransactions, setAllTransactions] = useState(mockData.transactions);
+    // Popup hạn mức
+  const [isLimitModalOpen, setLimitModalOpen] = useState(false);
 
   // List data transactions call API
-  const { transactions, totalCard, createTransactions } = useTransactions(changeDate);
+  const { transactions, totalCard, createTransactions } = useTransactions(changeDate, isLimitModalOpen);
 
   // List data categories call API
   const { categories } = useCategories();
 
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [isLimitModalOpen, setLimitModalOpen] = useState(false);
+  // Create data Budgets_Limit call API
+  const { createBudgetsLimit } = useBudgetsLimit();
 
+  // Popup thêm giao dịch
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  // Ngày được click chọn trên lịch
   const [selectedDate, setSelectedDate] = useState(null);
 
+  // Popup thông tin user
   const [isProfileOpen, setProfileOpen] = useState(false);
 
   const profileRef = useRef(null);
 
   const navigate = useNavigate();
+
+  // Logout
   const handleLogOut = () => {
     localStorage.removeItem('access_token');
     navigate('/login');
@@ -62,6 +68,7 @@ const Dashboard = () => {
     setChangeDate(formatToLocalDateString(date));
   };
 
+  // Click ở ngoài dropdown thì tắt popup của profile
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
@@ -84,13 +91,9 @@ const Dashboard = () => {
     createTransactions(newTransaction);
   };
 
-  // COmment lại
-  // const handleSetLimit = (newLimit) => {
-  //   setAllTransactions(prev => ({ ...prev, stats: { ...prev.stats, spendingLimit: newLimit } }));
-  //   setLimitModalOpen(false);
-  // };
-  // Để lại hàm này cho khỏi lỗi(để hôm sau xử lý)
-  const handleSetLimit = () => {
+  // Thêm hạn mức Budgets_limit
+  const handleSetLimit = (newLimit) => {
+    createBudgetsLimit(newLimit)
     setLimitModalOpen(false);
   };
 
@@ -171,7 +174,12 @@ const Dashboard = () => {
         totalCard={totalCard}
         onAddTransaction={handleAddTransaction}
       />
-      <SpendingLimitModal isOpen={isLimitModalOpen} onClose={() => setLimitModalOpen(false)} currentLimit={stats.spendingLimit} onSetLimit={handleSetLimit} />
+      <SpendingLimitModal
+        isOpen={isLimitModalOpen}
+        onClose={() => setLimitModalOpen(false)}
+        currentLimit={totalCard?.data?.budgetLimit}
+        onSetLimit={handleSetLimit}
+      />
     </div>
   );
 };

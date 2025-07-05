@@ -75,7 +75,7 @@ namespace server.Controllers
                     issuer: _configuration["Jwt:issuer"],
                     audience: _configuration["Jwt:audience"],
                     claims: claims,
-                    expires: DateTime.UtcNow.AddHours(1), // Hết hạn token sau 1 tiếng
+                    expires: DateTime.UtcNow.AddDays(1), // Hết hạn token sau 1 ngày
                     signingCredentials: creds
                 );
 

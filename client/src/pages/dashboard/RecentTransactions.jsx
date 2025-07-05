@@ -22,7 +22,6 @@ const RecentTransactions = ({ transactions }) => {
         ?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         ?.slice(0, 10);
 
-        console.log(allTransactions)
     return (
         <div className="bg-white p-6 rounded-2xl shadow-md h-full">
             <div className="flex justify-between items-center mb-4">
