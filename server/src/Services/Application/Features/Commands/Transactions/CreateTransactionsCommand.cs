@@ -15,7 +15,7 @@ namespace Application.Features.Commands.Transactions
     {
         public int CategoryId { get; set; }
         public decimal Amount { get; set; }
-        public DateTime Transaction_Date { get; set; }
+        public DateOnly Transaction_Date { get; set; }
 
         // 1: income, 2: expense
         public int Transaction_Type { get; set; }
@@ -54,7 +54,8 @@ namespace Application.Features.Commands.Transactions
                     CategoryId = request.CategoryId,
                     Description = request.Description,
                     Amount = request.Amount,
-                    TransactionDate = request.Transaction_Date,
+                    // Đổi sang kiểu Date trong DB nên dùng DateOnly ở BE
+                    TransactionDate = request.Transaction_Date, 
                     TransactionType = request.Transaction_Type,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,

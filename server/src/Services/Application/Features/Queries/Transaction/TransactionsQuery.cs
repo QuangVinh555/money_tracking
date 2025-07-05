@@ -16,30 +16,17 @@ namespace Application.Features.Queries.Transaction
     public interface ITransactionQuery
     {
         /// <summary>
-        /// Lấy ra danh sách giao dịch theo tháng hiện tại
-        /// </summary>
-        /// <returns></returns>
-        public Task<List<TransactionsResponse>> GetAllTransactionsByCurrentMonth();
-
-        /// <summary>
-        /// Lấy ra danh sách giao dịch theo ngày tự chọn
-        /// </summary>
-        /// <param name="OptionDate"></param>
-        /// <returns></returns>
-        public Task<List<TransactionsResponse>> GetAllTransactionsByDate(DateTime OptionDate);
-
-        /// <summary>
         /// Tính tông thu nhập, tổng chi tiêu, hạn mức, số dư
         /// </summary>
         /// <param name="OptionDate"></param>
         /// <returns></returns>
-        public Task<TransactionsTotalCardResponse> TransactionsTotalCardByDate(DateTime? OptionDate);
+        public Task<TransactionsTotalCardResponse> TransactionsTotalCardByDate(DateOnly? OptionDate);
 
         /// <summary>
         /// Lấy ra các giao dịch trong tháng nhóm lại theo từng ngày trong tháng
         /// </summary>
         /// <returns></returns>
-        public Task<List<TransactionsGroupByDateResponse>> GetTransactionsGroupByDate(DateTime? OptionDate);
+        public Task<List<TransactionsGroupByDateResponse>> GetTransactionsGroupByDate(DateOnly? OptionDate);
     }
     public class TransactionsQuery : ITransactionQuery
     {
@@ -50,96 +37,42 @@ namespace Application.Features.Queries.Transaction
             _context = context;
             _currentUser = currentUser;
         }
-        public async Task<List<TransactionsResponse>> GetAllTransactionsByCurrentMonth()
+
+        public async Task<TransactionsTotalCardResponse> TransactionsTotalCardByDate(DateOnly? OptionDate)
         {
-            // Lấy ngày hiện tại
-            var now = DateTime.UtcNow;
+            var userId = _currentUser.UserId;
 
-            // Chuyển về ngày đầu tháng(UTC) và chọn tới cuối tháng
-            var firstDayOfMonth = DateTimeExtensions.ToUtcStartOfMonth(now);
-            var firstDayOfNextMonth = DateTimeExtensions.ToUtcEndOfMonth(now);
-
-            var transactions = await _context.Transactions
-                .Where(t => t.TransactionDate >= firstDayOfMonth && t.TransactionDate < firstDayOfNextMonth && t.Actived == true)
-                .Include(t => t.User)
-                .Include(t => t.Category)
-                .Select(t => new TransactionsResponse
-                {
-                    TransactionId = t.TransactionId,
-                    UserId = t.UserId,
-                    FullName = t.User.Fullname,
-                    CategoryId = t.CategoryId,
-                    CategoryName = t.Category.CategoryName,
-                    Description = t.Description ?? "",
-                    Amount = t.Amount,
-                    TransactionDate = t.TransactionDate,
-                    TransactionType = t.TransactionType,
-                    TransactionTypeName = t.TransactionType == 1 ? ConstTransactionType.INCOME : ConstTransactionType.EXPENSE,
-                    Actived = t.Actived,
-                    CreatedAt = t.CreatedAt,
-                    UpdateAt = t.UpdatedAt,
-                })
-                .OrderByDescending(t => t.TransactionDate)
-                .ToListAsync();
-
-            return transactions;
-        }
-
-        public async Task<List<TransactionsResponse>> GetAllTransactionsByDate(DateTime OptionDate)
-        {
-            // Chuyển về kiểu (UTC) và chọn tới cuối ngày
-            var fromDate = DateTimeExtensions.ToUtcStartOfMonth(OptionDate);
-            var toDate = DateTimeExtensions.ToUtcEndOfMonth(OptionDate);
-
-            var transactions = await _context.Transactions
-                .Where(t =>  t.TransactionDate >= fromDate && t.TransactionDate < toDate && t.Actived == true)
-                .Select(t => new TransactionsResponse
-                {
-                    TransactionId = t.TransactionId,
-                    UserId = t.UserId,
-                    CategoryId = t.CategoryId,
-                    CategoryName = t.Category.CategoryName,
-                    Description = t.Description ?? "",
-                    Amount = t.Amount,
-                    TransactionDate = t.TransactionDate,
-                    TransactionType = t.TransactionType,
-                    TransactionTypeName = t.TransactionType == 1 ? ConstTransactionType.INCOME : ConstTransactionType.EXPENSE,
-                    Actived = t.Actived,
-                    CreatedAt = t.CreatedAt,
-                    UpdateAt = t.UpdatedAt,
-                })
-                .OrderByDescending (t => t.TransactionDate)
-                .ToListAsync();
-
-            return transactions;
-
-        }
-
-        public async Task<TransactionsTotalCardResponse> TransactionsTotalCardByDate(DateTime? OptionDate)
-        {
             // Không có value thì lấy ngày tháng hiện tại
             if (!OptionDate.HasValue)
             {
-                OptionDate = DateTime.UtcNow;
+                OptionDate = DateOnly.FromDateTime(DateTime.UtcNow);
             }
 
             // Chuyển về kiểu (UTC) và chọn tới cuối ngày
-            var fromDate = DateTimeExtensions.ToUtcStartOfMonth(OptionDate.Value);
-            var toDate = DateTimeExtensions.ToUtcEndOfMonth(OptionDate.Value);
+            var fromDate = DateTimeExtensions.ToStartOfMonth(OptionDate.Value);
+            var toDate = DateTimeExtensions.ToEndOfMonth(OptionDate.Value);
 
             // Tổng thu nhập
             var totalIncome = await _context.Transactions
-                .Where(t => t.TransactionType == 1 && t.TransactionDate >= fromDate && t.TransactionDate < toDate)
+                .Where(t => t.TransactionType == 1 
+                    && t.TransactionDate >= fromDate 
+                    && t.TransactionDate <= toDate
+                    && t.UserId == userId
+                )
                 .SumAsync(t => t.Amount);
 
             // Tổng chi tiêu
             var totalExpense = await _context.Transactions
-                .Where(t => t.TransactionType == 2 && t.TransactionDate >= fromDate && t.TransactionDate < toDate)
+                .Where(t => t.TransactionType == 2 
+                    && t.TransactionDate >= fromDate 
+                    && t.TransactionDate <= toDate 
+                    && t.UserId == userId
+                )
                 .SumAsync(t => t.Amount);
 
             // Hạn mức (Lấy ngày đầu tiên của tháng để so sánh với cột ngày đầu tiên của hạn mức)
             var budgetLimit = await _context.BudgetsLimits
-                .Where(b => b.BudgetsLimitStartDate != null && b.BudgetsLimitStartDate.Value.Date == fromDate.Date)
+                .Where(b => b.BudgetsLimitStartDate != null && b.BudgetsLimitStartDate.Value == fromDate)
                 .FirstOrDefaultAsync();
 
             return new TransactionsTotalCardResponse
@@ -150,12 +83,12 @@ namespace Application.Features.Queries.Transaction
             };
         }
 
-        public async Task<List<TransactionsGroupByDateResponse>> GetTransactionsGroupByDate(DateTime? OptionDate)
+        public async Task<List<TransactionsGroupByDateResponse>> GetTransactionsGroupByDate(DateOnly? OptionDate)
         {
             var userId = _currentUser.UserId;
 
             // Lấy ngày hiện tại
-            var now = DateTime.UtcNow;
+            var now = DateOnly.FromDateTime(DateTime.UtcNow);
 
             /*
                 - Chuyển về ngày đầu tháng(UTC) và chọn tới cuối tháng(UTC)
@@ -163,12 +96,12 @@ namespace Application.Features.Queries.Transaction
                 + False: Sẽ lấy ngày hiện tại và chuyển theo đầu tháng - cuối tháng
             */
             var firstDayOfMonth = OptionDate.HasValue 
-                ? DateTimeExtensions.ToUtcStartOfMonth(OptionDate.Value) 
-                : DateTimeExtensions.ToUtcStartOfMonth(now);
+                ? DateTimeExtensions.ToStartOfMonth(OptionDate.Value) 
+                : DateTimeExtensions.ToStartOfMonth(now);
 
             var firstDayOfNextMonth = OptionDate.HasValue 
-                ? DateTimeExtensions.ToUtcEndOfMonth(OptionDate.Value)
-                : DateTimeExtensions.ToUtcEndOfMonth(now);
+                ? DateTimeExtensions.ToEndOfMonth(OptionDate.Value)
+                : DateTimeExtensions.ToEndOfMonth(now);
 
             var transactions = await _context.Transactions
                 .Where(t => t.TransactionDate >= firstDayOfMonth 
@@ -182,9 +115,9 @@ namespace Application.Features.Queries.Transaction
                 {
                     TransactionId = t.TransactionId,
                     UserId = t.UserId,
-                    FullName = t.User.Fullname,
+                    FullName = t.User.Fullname ?? "",
                     CategoryId = t.CategoryId,
-                    CategoryName = t.Category.CategoryName,
+                    CategoryName = t.Category.CategoryName ?? "",
                     Description = t.Description ?? "",
                     Amount = t.Amount,
                     TransactionDate = t.TransactionDate,
@@ -197,7 +130,7 @@ namespace Application.Features.Queries.Transaction
                 .ToListAsync();
 
                 var groupedTransactions = transactions
-                    .GroupBy(t => t.TransactionDate.Date)
+                    .GroupBy(t => t.TransactionDate)
                     .Select(g => new TransactionsGroupByDateResponse
                     {
                         DateTime = g.Key.ToString("yyyy-MM-dd"), //  giờ hợp lệ vì xử lý trong bộ nhớ(không format trực tiếp khi viết linq trong sql)

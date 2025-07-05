@@ -13,7 +13,7 @@ namespace server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class TransactionsController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -65,47 +65,12 @@ namespace server.Controllers
         }
 
         /// <summary>
-        /// Lấy danh sách giao dịch tháng hiện tại.
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("current-month")]
-        public async Task<IActionResult> GetAllTransactionsByCurrentMonth()
-        {
-            var data = await _transactionQuery.GetAllTransactionsByCurrentMonth();
-
-            return Ok(new ApiResponse<List<TransactionsResponse>>
-            {
-                Success = true,
-                Data = data,
-                Message = "Lấy danh sách giao dịch tháng hiện tại thành công."
-            });
-        }
-
-        /// <summary>
-        /// Lấy danh sách giao dịch ngày(tùy chọn).
-        /// </summary>
-        /// <param name="OptionDate"></param>
-        /// <returns></returns>
-        [HttpGet("by-date")]
-        public async Task<IActionResult> GetAllTransactionsByDate([FromQuery] DateTime OptionDate)
-        {
-            var data = await _transactionQuery.GetAllTransactionsByDate(OptionDate);
-
-            return Ok(new ApiResponse<List<TransactionsResponse>>
-            {
-                Success = true,
-                Data = data,
-                Message = "Lấy danh sách giao dịch ngày này thành công."
-            });
-        }
-
-        /// <summary>
         /// Tính tổng các card.
         /// </summary>
         /// <param name="OptionDate"></param>
         /// <returns></returns>
         [HttpGet("total-card")]
-        public async Task<IActionResult> TransactionsTotalCardByDate([FromQuery] DateTime? OptionDate)
+        public async Task<IActionResult> TransactionsTotalCardByDate([FromQuery] DateOnly? OptionDate)
         {
             var data = await _transactionQuery.TransactionsTotalCardByDate(OptionDate);
 
@@ -123,7 +88,7 @@ namespace server.Controllers
         /// <param name="OptionDate"></param>
         /// <returns></returns>
         [HttpGet("get-by-group-date")]
-        public async Task<IActionResult> GetTransactionsGroupByDate(DateTime? OptionDate)
+        public async Task<IActionResult> GetTransactionsGroupByDate(DateOnly? OptionDate)
         {
             var data = await _transactionQuery.GetTransactionsGroupByDate(OptionDate);
 

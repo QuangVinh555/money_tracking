@@ -17,7 +17,7 @@ namespace Application.Features.Commands.Transactions
         public int UserId { get; set; }
         public int CategoryId { get; set; }
         public decimal Amount { get; set; }
-        public DateTime Transaction_Date { get; set; }
+        public DateOnly Transaction_Date { get; set; }
 
         // 1: income, 2: expense
         public int Transaction_Type { get; set; }
@@ -54,12 +54,12 @@ namespace Application.Features.Commands.Transactions
                         });
                 }
 
-                // Ép kiểu về UTC
-                var transactionDate = DateTimeExtensions.EnsureUtc(request.Transaction_Date);
+                // Ép kiểu về UTC(Sủa lại đoạn này không cần convert về UTC nữa vì Db chủ lưu "YYYY-MM-DD") thôi
+                //var transactionDate = DateTimeExtensions.EnsureUtc(request.Transaction_Date);
 
                 exitedTransaction.CategoryId = request.CategoryId;
                 exitedTransaction.Amount = request.Amount;
-                exitedTransaction.TransactionDate = transactionDate;
+                exitedTransaction.TransactionDate = request.Transaction_Date;
                 exitedTransaction.TransactionType = request.Transaction_Type;
                 exitedTransaction.Description = request.Description;
                 exitedTransaction.UpdatedAt = DateTime.UtcNow;

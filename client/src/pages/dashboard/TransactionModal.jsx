@@ -58,7 +58,11 @@ const TransactionModal = ({
     const newTransaction = {
       categoryId: category,
       amount: parseInt(amount, 10),
-      // Nếu gửi không kèm giờ thì nên gửi thằng dạng "YYYY-MM-DD", nếu kèm giờ phút giây thì phải convert sang UTC
+      /* 
+        Nếu gửi không kèm giờ thì nên gửi thằng dạng "YYYY-MM-DD", 
+        Nếu kèm giờ phút giây thì phải convert sang UTC
+        DB đã chỉnh lại kiểu date = "YYYY-MM-DD"
+      */
       transaction_Date: formatToLocalDateString(selectedDate),
       transaction_Type: txType,
       description,

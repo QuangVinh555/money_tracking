@@ -14,8 +14,8 @@ namespace Application.Features.DTOs.Transactions
         public int CategoryId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public decimal Amount { get; set; }
-        public DateTime TransactionDate { get; set; }
+        public decimal? Amount { get; set; }
+        public DateOnly TransactionDate { get; set; }
         public int? TransactionType { get; set; }
         public string TransactionTypeName { get; set; } = string.Empty;
         public bool? Actived { get; set; }
