@@ -89,7 +89,9 @@ namespace server.Controllers
                         email = user.Email,
                         fullName = user.Fullname
                     },
-                    token = new JwtSecurityTokenHandler().WriteToken(token)
+                    Success = true,
+                    Message = "Success",
+                    token = new JwtSecurityTokenHandler().WriteToken(token),                      
                 });
             }
             catch (Exception ex)
