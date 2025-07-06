@@ -11,8 +11,6 @@ import {
   TrendingUp,
   TrendingDown,
   CreditCard,
-  Download,
-  PlusCircle
 } from "lucide-react";
 import useTransactions from "../../hook/transactions.js";
 import ProfileDropdown from "./ProfileDropdown.jsx";
@@ -27,20 +25,23 @@ const Dashboard = () => {
   // Lấy chữ cái đầu tiên làm avatar logo
   const avatarLetter = userName?.charAt(0).toUpperCase() || 'A';
 
+  // Set trạng thái loading
+  // const [isLoading, setIsLoading] = useState(false);
+
   // State lưu giá trị datetime (click tháng trước, tháng sau) truyền component con(CalendarView) sang component cha
   const [changeDate, setChangeDate] = useState(formatToLocalDateString(new Date()));
 
   // State lưu sự thay đổi của hạn mức để call API dựa vào giá trị này mà load lại data
-  const[changeLimit, setChangeLimit] = useState(0);
+  // const [changeLimit, setChangeLimit] = useState(0);
 
-    // Popup hạn mức
+  // Popup hạn mức
   const [isLimitModalOpen, setLimitModalOpen] = useState(false);
 
   // Create data Budgets_Limit call API
-  const { createBudgetsLimit } = useBudgetsLimit();
+  const { loadingBudgetsLimit, createBudgetsLimit } = useBudgetsLimit();
 
   // List data transactions call API
-  const { transactions, totalCard, createTransactions } = useTransactions(changeDate, changeLimit);
+  const { transactions, totalCard, createTransactions, loading, fetchTotalCardTransactions } = useTransactions(changeDate);
 
   // List data categories call API
   const { categories } = useCategories();
@@ -98,9 +99,10 @@ const Dashboard = () => {
   };
 
   // Thêm hạn mức Budgets_limit
-  const handleSetLimit = (newLimit) => {
-    createBudgetsLimit(newLimit)
+  const handleSetLimit = async (newLimit) => {
+    await createBudgetsLimit(newLimit)
     setLimitModalOpen(false);
+    fetchTotalCardTransactions();
   };
 
   return (
@@ -179,13 +181,14 @@ const Dashboard = () => {
         categories={categories}
         totalCard={totalCard}
         onAddTransaction={handleAddTransaction}
+        isLoading={loading}
       />
       <SpendingLimitModal
         isOpen={isLimitModalOpen}
         onClose={() => setLimitModalOpen(false)}
         currentLimit={totalCard?.data?.budgetLimit}
         onSetLimit={handleSetLimit}
-        onChangeLimit={setChangeLimit}
+        isLoading={loadingBudgetsLimit}
       />
     </div>
   );

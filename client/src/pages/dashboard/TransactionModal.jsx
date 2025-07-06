@@ -6,7 +6,8 @@ import {
   Utensils,
   Car,
   Home,
-  X
+  X,
+  Loader2
 } from "lucide-react";
 import { TRANSACTIONS_TYPE } from "../../constants/common";
 
@@ -29,6 +30,7 @@ const TransactionModal = ({
   categories,
   totalCard,
   onAddTransaction,
+  isLoading
 }) => {
   // State quản lý loại giao dịch (1: thu nhập, 2: chi tiêu)
   const [txType, setTxType] = useState(TRANSACTIONS_TYPE.EXPENSE);
@@ -38,16 +40,12 @@ const TransactionModal = ({
   const [description, setDescription] = useState("");
   
   if (!isOpen) return null;
-  console.log("transactions", transactions.data)
-  console.log("selectedDate", selectedDate)
 
   const transactionsForDate = transactions.data?.filter(
     (tx) => { 
       return (tx.dateTime === formatToLocalDateString(selectedDate))
     }
   );
-  console.log("transactionsForDate", transactionsForDate)
-
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -63,7 +61,6 @@ const TransactionModal = ({
       transaction_Type: txType,
       description,
     };
-    console.log(newTransaction)
     onAddTransaction(newTransaction);
     // Reset form
     setAmount("");
@@ -165,9 +162,9 @@ const TransactionModal = ({
               />
               <button
                 type="submit"
-                className="w-full py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors"
+                className="w-full py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
               >
-                Thêm giao dịch
+                {isLoading ? <Loader2 className="w-5 h-5 animate-spin"/> : 'Thêm giao dịch'}
               </button>
             </form>
           </div>

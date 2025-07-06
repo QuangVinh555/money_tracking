@@ -1,14 +1,15 @@
 import { useState } from "react";
 import {
+    Loader2,
     X
 } from 'lucide-react';
 
 import { formatCurrency } from "../../utils/format";
-const SpendingLimitModal = ({ isOpen, onClose, currentLimit, onSetLimit, onChangeLimit }) => {
+const SpendingLimitModal = ({ isOpen, onClose, currentLimit, onSetLimit, isLoading }) => {
     if (!isOpen) return null;
 
     const [limit, setLimit] = useState(currentLimit);
-    
+
     // Hạn mức mặc định
     const suggestions = [5000000, 10000000, 15000000, 20000000];
     const handleSubmit = (e) => {
@@ -16,7 +17,6 @@ const SpendingLimitModal = ({ isOpen, onClose, currentLimit, onSetLimit, onChang
         var newLimit = {
             Budgets_Limit_Total: Number(limit)
         }
-        onChangeLimit(newLimit)
         onSetLimit(newLimit);
     };
 
@@ -39,7 +39,7 @@ const SpendingLimitModal = ({ isOpen, onClose, currentLimit, onSetLimit, onChang
                             {suggestions.map(s => <button key={s} type="button" onClick={() => setLimit(s)} className="p-2 border rounded-lg text-center hover:bg-gray-100 transition-colors">{formatCurrency(s)}</button>)}
                         </div>
                     </div>
-                    <button type="submit" className="w-full py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-lg hover:opacity-90 transition-opacity">Lưu Hạn Mức</button>
+                    <button type="submit" className="w-full py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center">{isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Lưu hạn mức'}</button>
                 </form>
             </div>
         </div>

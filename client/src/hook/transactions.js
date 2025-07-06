@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import transactionsApi from '../api/modules/transactions';
 
-export default function useTransactions(datetime, changeLimit) {
+export default function useTransactions(datetime) {
   const [transactions, setTransactions] = useState([]);
   const [totalCard, setTotalCard] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Lấy những giao dịch theo tháng được group by theo từng ngày
   const fetchTransactions = async () => {
@@ -31,8 +31,15 @@ export default function useTransactions(datetime, changeLimit) {
   };
 
   const createTransactions = async (data) => {
-    await transactionsApi.create(data);
-    await fetchTransactions();
+    try {
+      setLoading(true);
+      await transactionsApi.create(data);
+      await fetchTransactions();
+    } catch (err) {
+      console.error('Lỗi tạo transactions:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const updateTransactions = async (id, data) => {
@@ -51,7 +58,7 @@ export default function useTransactions(datetime, changeLimit) {
 
   useEffect(() => {
     fetchTotalCardTransactions();
-  }, [transactions, changeLimit]);
+  }, [transactions]);
 
   return {
     transactions,
@@ -60,5 +67,7 @@ export default function useTransactions(datetime, changeLimit) {
     createTransactions,
     updateTransactions,
     deleteTransactions,
+    fetchTransactions,
+    fetchTotalCardTransactions
   };
 }

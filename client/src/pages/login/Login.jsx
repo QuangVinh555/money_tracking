@@ -40,7 +40,7 @@ const Login = () => {
             console.error('Đăng nhập thất bại:', err);
         }
     };
-    
+
     // 👉 Show loader nếu đang loading
     if (isLoading) return <FullScreenLoader />;
 
@@ -90,7 +90,7 @@ const Login = () => {
                     transition: all 0.2s ease-in-out;
                 }
             `}</style>
-            <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-100 via-indigo-200 to-purple-100 animate-gradient">
+            <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-200 to-purple-800 animate-gradient">
                 <div className="w-full max-w-md bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 md:p-10 border border-white/30">
                     <div className="flex justify-center mb-6 animate-fade-in-up">
                         <img
