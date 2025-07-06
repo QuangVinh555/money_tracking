@@ -22,6 +22,11 @@ import useCategories from "../../hook/categories.js";
 import useBudgetsLimit from "../../hook/budgets_limit.js";
 
 const Dashboard = () => {
+  // Lấy thông tin từ localstorage
+  const userName = localStorage.getItem('userInfo');
+  // Lấy chữ cái đầu tiên làm avatar logo
+  const avatarLetter = userName?.charAt(0).toUpperCase() || 'A';
+
   // State lưu giá trị datetime (click tháng trước, tháng sau) truyền component con(CalendarView) sang component cha
   const [changeDate, setChangeDate] = useState(formatToLocalDateString(new Date()));
 
@@ -56,6 +61,7 @@ const Dashboard = () => {
   // Logout
   const handleLogOut = () => {
     localStorage.removeItem('access_token');
+    localStorage.removeItem('userInfo');
     navigate('/login');
   }
 
@@ -108,15 +114,15 @@ const Dashboard = () => {
             <div>
               <h2 className="text-3xl font-bold text-gray-900">Tổng quan</h2>
               <p className="text-gray-500">
-                Chào mừng trở lại, Vinh! Đây là báo cáo tài chính của bạn.
+                Chào mừng trở lại, {userName}! Đây là báo cáo tài chính của bạn.
               </p>
             </div>
             <div className="flex items-center gap-4" ref={profileRef}>
               <button onClick={() => setProfileOpen(p => !p)} className="flex items-center gap-3 p-1 pr-3 rounded-full hover:bg-gray-200 transition-colors">
-                <img src="https://placehold.co/40x40/e0e7ff/3730a3?text=A" alt="Avatar" className="w-10 h-10 rounded-full" />
-                <span className="hidden sm:inline font-semibold text-gray-700">Quang Vinh</span>
+                <img src={`https://placehold.co/40x40/e0e7ff/3730a3?text=${avatarLetter}`} alt="Avatar" className="w-10 h-10 rounded-full" />
+                <span className="hidden sm:inline font-semibold text-gray-700">{userName}</span>
               </button>
-              {isProfileOpen && <ProfileDropdown onLogout={handleLogOut} />}
+              {isProfileOpen && <ProfileDropdown userInfo={userName} onLogout={handleLogOut} />}
             </div>
           </header>
 

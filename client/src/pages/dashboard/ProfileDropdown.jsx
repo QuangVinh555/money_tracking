@@ -1,13 +1,13 @@
 import React from 'react'
 import {LogOut, User, Settings, HelpCircle} from 'lucide-react';
-const ProfileDropdown = ({onLogout}) => {
+const ProfileDropdown = ({userInfo, onLogout}) => {
     return (
         <div className="absolute top-14 right-0 w-60 bg-white rounded-lg shadow-xl border z-50 animate-fade-in-up" style={{ animationDuration: '0.3s' }}>
             <div className="p-2">
                 <div className="flex items-center gap-3 px-3 py-2">
                     <img src="https://placehold.co/40x40/e0e7ff/3730a3?text=A" alt="Avatar" className="w-10 h-10 rounded-full" />
                     <div>
-                        <p className="font-bold text-gray-800">Quang Vinh</p>
+                        <p className="font-bold text-gray-800">{userInfo}</p>
                         <p className="text-sm text-gray-500">Người dùng Pro</p>
                     </div>
                 </div>

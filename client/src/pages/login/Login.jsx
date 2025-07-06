@@ -3,7 +3,7 @@ import axios from 'axios';
 import {
     TrendingUp, BarChart3, Gem
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FullScreenLoader from '../../component/loading/FullScreenLoader';
 const Login = () => {
@@ -23,10 +23,11 @@ const Login = () => {
                 idToken
             });
 
-            const { token, success } = res.data;
+            const { token, success, userInfo } = res.data;
             if (success) {
                 // Lưu token hệ thống
                 localStorage.setItem('access_token', token);
+                localStorage.setItem('userInfo', userInfo.fullName);
                 setIsLoading(false);
                 navigate('/');
             } else {
@@ -39,7 +40,7 @@ const Login = () => {
             console.error('Đăng nhập thất bại:', err);
         }
     };
-
+    
     // 👉 Show loader nếu đang loading
     if (isLoading) return <FullScreenLoader />;
 
