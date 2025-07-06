@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
     X
 } from 'lucide-react';
 
 import { formatCurrency } from "../../utils/format";
-const SpendingLimitModal = ({ isOpen, onClose, currentLimit, onSetLimit }) => {
+const SpendingLimitModal = ({ isOpen, onClose, currentLimit, onSetLimit, onChangeLimit }) => {
     if (!isOpen) return null;
 
     const [limit, setLimit] = useState(currentLimit);
@@ -16,6 +16,7 @@ const SpendingLimitModal = ({ isOpen, onClose, currentLimit, onSetLimit }) => {
         var newLimit = {
             Budgets_Limit_Total: Number(limit)
         }
+        onChangeLimit(newLimit)
         onSetLimit(newLimit);
     };
 

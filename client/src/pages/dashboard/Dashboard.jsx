@@ -26,19 +26,19 @@ const Dashboard = () => {
   const [changeDate, setChangeDate] = useState(formatToLocalDateString(new Date()));
 
   // State lưu sự thay đổi của hạn mức để call API dựa vào giá trị này mà load lại data
-  // const[changeLimit, setChangeLimit] = useState(0);
+  const[changeLimit, setChangeLimit] = useState(0);
 
     // Popup hạn mức
   const [isLimitModalOpen, setLimitModalOpen] = useState(false);
 
+  // Create data Budgets_Limit call API
+  const { createBudgetsLimit } = useBudgetsLimit();
+
   // List data transactions call API
-  const { transactions, totalCard, createTransactions } = useTransactions(changeDate, isLimitModalOpen);
+  const { transactions, totalCard, createTransactions } = useTransactions(changeDate, changeLimit);
 
   // List data categories call API
   const { categories } = useCategories();
-
-  // Create data Budgets_Limit call API
-  const { createBudgetsLimit } = useBudgetsLimit();
 
   // Popup thêm giao dịch
   const [isModalOpen, setModalOpen] = useState(false);
@@ -179,6 +179,7 @@ const Dashboard = () => {
         onClose={() => setLimitModalOpen(false)}
         currentLimit={totalCard?.data?.budgetLimit}
         onSetLimit={handleSetLimit}
+        onChangeLimit={setChangeLimit}
       />
     </div>
   );
