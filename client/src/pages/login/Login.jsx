@@ -94,7 +94,7 @@ const Login = () => {
                 <div className="w-full max-w-md bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 md:p-10 border border-white/30">
                     <div className="flex justify-center mb-6 animate-fade-in-up">
                         <img
-                            src="../../../public/url_icon.png"
+                            src="/url_icon.png" // nằm trong thư mục public mặc định là root, deploy lên domain/url_icon.png
                             alt="Financial Illustration"
                             className="w-48 h-auto"
                             onError={(e) => {

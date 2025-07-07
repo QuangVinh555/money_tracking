@@ -131,20 +131,20 @@ const Dashboard = () => {
           {/* Stat Cards Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
             <StatCard
-              title="Hạn mức"
-              amount={totalCard.data?.budgetLimit || 0}
-              icon={<CreditCard size={24} className="text-green-500" />}
-              colorClass="bg-green-100"
-              onEdit={() => setLimitModalOpen(true)}
-            />
-            <StatCard
               title="Tổng thu nhập"
               amount={totalCard.data?.income || 0}
               icon={<TrendingUp size={24} className="text-green-500" />}
               colorClass="bg-green-100"
             />
             <StatCard
-              title="Tổng chi"
+              title="Hạn mức tháng này"
+              amount={totalCard.data?.budgetLimit || 0}
+              icon={<CreditCard size={24} className="text-green-500" />}
+              colorClass="bg-green-100"
+              onEdit={() => setLimitModalOpen(true)}
+            />
+            <StatCard
+              title="Tổng chi tiêu"
               amount={totalCard.data?.expense || 0}
               icon={<TrendingDown size={24} className="text-red-500" />}
               colorClass="bg-red-100"
