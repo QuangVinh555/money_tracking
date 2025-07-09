@@ -6,6 +6,8 @@ import {
   Utensils,
   Car,
   Home,
+  Building2,
+  Wallet,
   X,
   Loader2
 } from "lucide-react";
@@ -18,6 +20,8 @@ const categoryIcons = {
   "Di chuyển": <Car size={20} className="text-green-500" />,
   "Nhà cửa": <Home size={20} className="text-purple-500" />,
   "Lương": <DollarSign size={20} className="text-emerald-500" />,
+  "Đóng tiền trọ": <Building2 size={20} className="text-pink-500" />,
+  "Chi phí khác": <Wallet size={20} className="text-yellow-500" />,
   "Default": <DollarSign size={20} className="text-gray-500" />,
 };
 const getCategoryIcon = (category) =>
@@ -188,10 +192,10 @@ const TransactionModal = ({
                       <p className="font-semibold">{tx.description}</p>
                     </div>
                     <p
-                      className={`font-bold ${tx.type === "income" ? "text-green-500" : "text-red-500"
+                      className={`font-bold ${tx.type === TRANSACTIONS_TYPE.INCOME ? "text-green-500" : "text-red-500"
                         }`}
                     >
-                      {tx.type === "income" ? "+" : "-"}{" "}
+                      {tx.type === TRANSACTIONS_TYPE.INCOME ? "+" : "-"}{" "}
                       {formatCurrency(tx.amount)}
                     </p>
                   </div>
