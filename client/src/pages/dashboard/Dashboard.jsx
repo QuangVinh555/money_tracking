@@ -18,8 +18,13 @@ import { useNavigate } from "react-router-dom";
 import { formatToLocalDateString } from "../../utils/format.js";
 import useCategories from "../../hook/categories.js";
 import useBudgetsLimit from "../../hook/budgets_limit.js";
+import BudgetOverview from "../budgetOverview/BudgetOverview.jsx";
+import { mockData } from "../../constants/mock_data.js";
+import MonthlySummary from "../MonthlySummary/MonthlySummary.jsx";
 
 const Dashboard = () => {
+  const {stats} = mockData;
+ 
   // Lấy thông tin từ localstorage
   const userName = localStorage.getItem('userInfo');
   // Lấy chữ cái đầu tiên làm avatar logo
@@ -127,7 +132,8 @@ const Dashboard = () => {
               {isProfileOpen && <ProfileDropdown userInfo={userName} onLogout={handleLogOut} />}
             </div>
           </header>
-
+          <BudgetOverview stats={stats} onEditLimit={() => setLimitModalOpen(true)} />
+          <MonthlySummary data={transactions.data} />
           {/* Stat Cards Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
             <StatCard
