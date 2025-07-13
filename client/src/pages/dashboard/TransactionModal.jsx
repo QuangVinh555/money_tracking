@@ -192,10 +192,10 @@ const TransactionModal = ({
                       <p className="font-semibold">{tx.description}</p>
                     </div>
                     <p
-                      className={`font-bold ${tx.type === TRANSACTIONS_TYPE.INCOME ? "text-green-500" : "text-red-500"
+                      className={`font-bold ${tx.transactionType === TRANSACTIONS_TYPE.INCOME ? "text-green-500" : "text-red-500"
                         }`}
                     >
-                      {tx.type === TRANSACTIONS_TYPE.INCOME ? "+" : "-"}{" "}
+                      {tx.transactionType === TRANSACTIONS_TYPE.INCOME ? "+" : "-"}{" "}
                       {formatCurrency(tx.amount)}
                     </p>
                   </div>
