@@ -127,7 +127,7 @@ const Dashboard = () => {
               {isProfileOpen && <ProfileDropdown userInfo={userName} onLogout={handleLogOut} />}
             </div>
           </header>
-          <BudgetOverview totalCard={totalCard} onEditLimit={() => setLimitModalOpen(true)} />
+          <BudgetOverview totalCard={totalCard} changeDate={changeDate} onEditLimit={() => setLimitModalOpen(true)} />
           {/* Stat Cards Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
             <StatCard
