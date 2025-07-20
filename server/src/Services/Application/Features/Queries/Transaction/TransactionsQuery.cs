@@ -16,11 +16,18 @@ namespace Application.Features.Queries.Transaction
     public interface ITransactionQuery
     {
         /// <summary>
-        /// Tính tông thu nhập, tổng chi tiêu, hạn mức, số dư
+        /// Tính tông thu nhập, tổng chi tiêu, hạn mức, số dư theo tháng
         /// </summary>
         /// <param name="OptionDate"></param>
         /// <returns></returns>
         public Task<TransactionsTotalCardResponse> TransactionsTotalCardByDate(DateOnly? OptionDate);
+
+        /// <summary>
+        /// Tính tông thu nhập, tổng chi tiêu, hạn mức, số dư theo từng ngày
+        /// </summary>
+        /// <param name="OptionDate"></param>
+        /// <returns></returns>
+        public Task<TransactionsTotalCardResponse> TransactionsTotalCardByOptionDate(DateOnly? OptionDate);
 
         /// <summary>
         /// Lấy ra các giao dịch trong tháng nhóm lại theo từng ngày trong tháng
@@ -75,11 +82,17 @@ namespace Application.Features.Queries.Transaction
                 .Where(b => b.BudgetsLimitStartDate != null && b.BudgetsLimitStartDate.Value == fromDate && b.UserId == userId)
                 .FirstOrDefaultAsync();
 
+            // Chi tiêu trung bình / ngày(tính tới ngày hiện tại)
+            var toDateNow = DateOnly.FromDateTime(DateTime.UtcNow);
+            var totalDays = (toDateNow.ToDateTime(TimeOnly.MinValue) - fromDate.ToDateTime(TimeOnly.MinValue)).Days + 1;
+            var averageDailySpending = totalDays > 0 ? Math.Round((totalExpense ?? 0) / totalDays) : 0;
+
             return new TransactionsTotalCardResponse
             {
                 Income = totalIncome,
                 Expense = totalExpense,
                 BudgetLimit = budgetLimit?.BudgetsLimitTotal ?? 0,
+                AverageDailySpending = averageDailySpending
             };
         }
 
@@ -133,7 +146,7 @@ namespace Application.Features.Queries.Transaction
                     .GroupBy(t => t.TransactionDate)
                     .Select(g => new TransactionsGroupByDateResponse
                     {
-                        DateTime = g.Key.ToString("yyyy-MM-dd"), //  giờ hợp lệ vì xử lý trong bộ nhớ(không format trực tiếp khi viết linq trong sql)
+                        DateTime = g.Key, //  giờ hợp lệ vì xử lý trong bộ nhớ(không format trực tiếp khi viết linq trong sql)
                         Transactions = g.ToList()
                     })
                     .OrderByDescending(t => t.DateTime)
@@ -141,6 +154,40 @@ namespace Application.Features.Queries.Transaction
 
 
             return groupedTransactions;
+        }
+
+        public async Task<TransactionsTotalCardResponse> TransactionsTotalCardByOptionDate(DateOnly? OptionDate)
+        {
+            var userId = 3;
+
+            // Không có value thì lấy ngày tháng hiện tại
+            if (!OptionDate.HasValue)
+            {
+                OptionDate = DateOnly.FromDateTime(DateTime.UtcNow);
+            }
+
+            // Tổng thu nhập
+            var totalIncome = await _context.Transactions
+                .Where(t => t.TransactionType == 1
+                    && t.TransactionDate == OptionDate
+                    && t.UserId == userId
+                )
+                .SumAsync(t => t.Amount);
+
+            // Tổng chi tiêu
+            var totalExpense = await _context.Transactions
+                .Where(t => t.TransactionType == 2
+                    && t.TransactionDate == OptionDate
+                    && t.UserId == userId
+                )
+                .SumAsync(t => t.Amount);
+
+
+            return new TransactionsTotalCardResponse
+            {
+                Income = totalIncome,
+                Expense = totalExpense,
+            };
         }
     }
 }

@@ -8,7 +8,6 @@ import Layout from './component/layout/Layout';
 import Dashboard from './pages/dashboard/Dashboard';
 import Transactions from './pages/transactions/Transactions';
 import Categories from './pages/categories/Categories';
-import Budgets from './pages/budgets/Budgets';
 import Login from './pages/login/Login';
 import GuestRoute from './pages/login/GuestRoute';
 import PrivateRoute from './pages/login/PrivateRoute';
@@ -22,7 +21,7 @@ function App() {
                     <Route index element={<Dashboard />} />
                     <Route path="transactions" element={<Transactions />} />
                     <Route path="categories" element={<Categories />} />
-                    <Route path="budgets" element={<Budgets />} />
+                    {/* <Route path="budgets" element={<Budgets />} /> */}
                     {/* <Route path="accounts" element={<Accounts />} />
                     <Route path="goals" element={<Goals />} /> */}
                 </Route>

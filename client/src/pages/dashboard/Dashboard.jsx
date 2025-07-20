@@ -11,6 +11,7 @@ import {
   TrendingUp,
   TrendingDown,
   CreditCard,
+  PieChartIcon,
 } from "lucide-react";
 import useTransactions from "../../hook/transactions.js";
 import ProfileDropdown from "./ProfileDropdown.jsx";
@@ -18,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { formatToLocalDateString } from "../../utils/format.js";
 import useCategories from "../../hook/categories.js";
 import useBudgetsLimit from "../../hook/budgets_limit.js";
-
+import BudgetOverview from "../budgetOverview/BudgetOverview.jsx";
 const Dashboard = () => {
   // Lấy thông tin từ localstorage
   const userName = localStorage.getItem('userInfo');
@@ -31,8 +32,8 @@ const Dashboard = () => {
   // State lưu giá trị datetime (click tháng trước, tháng sau) truyền component con(CalendarView) sang component cha
   const [changeDate, setChangeDate] = useState(formatToLocalDateString(new Date()));
 
-  // State lưu sự thay đổi của hạn mức để call API dựa vào giá trị này mà load lại data
-  // const [changeLimit, setChangeLimit] = useState(0);
+  // Ngày được click chọn trên lịch
+  const [selectedDate, setSelectedDate] = useState(null);
 
   // Popup hạn mức
   const [isLimitModalOpen, setLimitModalOpen] = useState(false);
@@ -41,16 +42,13 @@ const Dashboard = () => {
   const { loadingBudgetsLimit, createBudgetsLimit } = useBudgetsLimit();
 
   // List data transactions call API
-  const { transactions, totalCard, createTransactions, loading, fetchTotalCardTransactions } = useTransactions(changeDate);
+  const { transactions, totalCard, totalCardByDate, createTransactions, loading, fetchTotalCardTransactions, fetchTotalCardByDateTransactions } = useTransactions(changeDate, selectedDate);
 
   // List data categories call API
   const { categories } = useCategories();
 
   // Popup thêm giao dịch
   const [isModalOpen, setModalOpen] = useState(false);
-
-  // Ngày được click chọn trên lịch
-  const [selectedDate, setSelectedDate] = useState(null);
 
   // Popup thông tin user
   const [isProfileOpen, setProfileOpen] = useState(false);
@@ -91,6 +89,8 @@ const Dashboard = () => {
   const handleDayClick = (date) => {
     setSelectedDate(date);
     setModalOpen(true);
+    // Vì đoạn này gọi api theo ngày đã chọn để tính toán nên phải format lại
+    fetchTotalCardByDateTransactions(formatToLocalDateString(date));
   };
 
   // Thêm giao dịch transactions
@@ -127,7 +127,7 @@ const Dashboard = () => {
               {isProfileOpen && <ProfileDropdown userInfo={userName} onLogout={handleLogOut} />}
             </div>
           </header>
-
+          <BudgetOverview totalCard={totalCard} changeDate={changeDate} onEditLimit={() => setLimitModalOpen(true)} />
           {/* Stat Cards Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
             <StatCard
@@ -135,13 +135,6 @@ const Dashboard = () => {
               amount={totalCard.data?.income || 0}
               icon={<TrendingUp size={24} className="text-green-500" />}
               colorClass="bg-green-100"
-            />
-            <StatCard
-              title="Hạn mức tháng này"
-              amount={totalCard.data?.budgetLimit || 0}
-              icon={<CreditCard size={24} className="text-green-500" />}
-              colorClass="bg-green-100"
-              onEdit={() => setLimitModalOpen(true)}
             />
             <StatCard
               title="Tổng chi tiêu"
@@ -153,6 +146,12 @@ const Dashboard = () => {
               title="Số dư"
               amount={totalCard.data?.balance || 0}
               icon={<DollarSign size={24} className="text-blue-500" />}
+              colorClass="bg-blue-100"
+            />
+            <StatCard
+              title="Chi tiêu TB/ngày"
+              amount={totalCard.data?.averageDailySpending || 0}
+              icon={<PieChartIcon size={24} className="text-blue-500" />}
               colorClass="bg-blue-100"
             />
           </div>
@@ -179,7 +178,7 @@ const Dashboard = () => {
         selectedDate={selectedDate}
         transactions={transactions}
         categories={categories}
-        totalCard={totalCard}
+        totalCard={totalCardByDate}
         onAddTransaction={handleAddTransaction}
         isLoading={loading}
       />

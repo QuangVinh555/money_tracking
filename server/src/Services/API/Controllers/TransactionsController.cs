@@ -99,5 +99,24 @@ namespace server.Controllers
                 Message = "Lấy ra các giao dịch thành công"
             });
         }
+
+        /// <summary>
+        /// Tính tổng các card theo từng ngày chọn.
+        /// </summary>
+        /// <param name="OptionDate"></param>
+        /// <returns></returns>
+        [HttpGet("total-card-by-date")]
+        public async Task<IActionResult> TransactionsTotalCardByOptionDate([FromQuery] DateOnly? OptionDate)
+        {
+            var data = await _transactionQuery.TransactionsTotalCardByOptionDate(OptionDate);
+
+            return Ok(new ApiResponse<TransactionsTotalCardResponse>
+            {
+                Success = true,
+                Data = data,
+                Message = $"Tổng số card ngày {OptionDate?.ToString("yyyy-MM-dd") ?? "không xác định"} đã được tính thành công."
+
+            });
+        }
     }
 }
