@@ -19,7 +19,7 @@ const RecentTransactions = ({ transactions }) => {
     // Xử lý toàn bộ giao dịch mới nhất
     const allTransactions = transactions.data
         ?.flatMap(group => group.transactions)
-        ?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        ?.sort((a, b) => new Date(b.transactionDate) - new Date(a.transactionDate))
         ?.slice(0, 10);
 
     return (

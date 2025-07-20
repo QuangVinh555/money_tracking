@@ -11,7 +11,8 @@ namespace Application.Features.DTOs.Transactions
         public decimal? Income { get; set; }
         public decimal? Expense { get; set; }    
         public decimal? BudgetLimit { get; set; }
-        public decimal? Balance => (BudgetLimit ?? 0) - Expense;
+        public decimal? Balance => (Income ?? 0) - Expense;
+        public decimal? RemainingLimit => (BudgetLimit ?? 0) - Expense;
         public decimal? AverageDailySpending { get; set;}
     }
 }

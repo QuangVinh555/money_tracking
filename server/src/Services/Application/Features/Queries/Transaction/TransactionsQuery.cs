@@ -146,7 +146,7 @@ namespace Application.Features.Queries.Transaction
                     .GroupBy(t => t.TransactionDate)
                     .Select(g => new TransactionsGroupByDateResponse
                     {
-                        DateTime = g.Key.ToString("yyyy-MM-dd"), //  giờ hợp lệ vì xử lý trong bộ nhớ(không format trực tiếp khi viết linq trong sql)
+                        DateTime = g.Key, //  giờ hợp lệ vì xử lý trong bộ nhớ(không format trực tiếp khi viết linq trong sql)
                         Transactions = g.ToList()
                     })
                     .OrderByDescending(t => t.DateTime)

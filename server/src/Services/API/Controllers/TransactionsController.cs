@@ -13,7 +13,7 @@ namespace server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class TransactionsController : ControllerBase
     {
         private readonly AppDbContext _context;

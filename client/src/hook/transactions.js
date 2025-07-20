@@ -4,6 +4,7 @@ import transactionsApi from '../api/modules/transactions';
 export default function useTransactions(datetime) {
   const [transactions, setTransactions] = useState([]);
   const [totalCard, setTotalCard] = useState(0);
+  const [totalCardByDate, setTotalCardByDate] = useState(0);
   const [loading, setLoading] = useState(false);
 
   // Lấy những giao dịch theo tháng được group by theo từng ngày
@@ -23,6 +24,18 @@ export default function useTransactions(datetime) {
     try {
       const res = await transactionsApi.getTotalCard(datetime);
       setTotalCard(res.data);
+    } catch (err) {
+      console.error('Lỗi fetch transactions:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+    // Tính thu nhập chi tiêu các giao dịch trong một ngày được chọn
+    const fetchTotalCardByDateTransactions = async (selectedDate) => {
+    try {
+      const res = await transactionsApi.getTotalCardByDate(selectedDate);
+      setTotalCardByDate(res.data);
     } catch (err) {
       console.error('Lỗi fetch transactions:', err);
     } finally {
@@ -56,6 +69,7 @@ export default function useTransactions(datetime) {
     fetchTransactions();
   }, [datetime]);
 
+  // Khi nào transactions không [](có data) thì mới gọi api tính toán
   useEffect(() => {
     fetchTotalCardTransactions();
   }, [transactions]);
@@ -63,11 +77,13 @@ export default function useTransactions(datetime) {
   return {
     transactions,
     totalCard,
+    totalCardByDate,
     loading,
     createTransactions,
     updateTransactions,
     deleteTransactions,
     fetchTransactions,
-    fetchTotalCardTransactions
+    fetchTotalCardTransactions,
+    fetchTotalCardByDateTransactions
   };
 }
