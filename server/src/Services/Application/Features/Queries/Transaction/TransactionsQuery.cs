@@ -118,7 +118,7 @@ namespace Application.Features.Queries.Transaction
 
             var transactions = await _context.Transactions
                 .Where(t => t.TransactionDate >= firstDayOfMonth 
-                    && t.TransactionDate < firstDayOfNextMonth 
+                    && t.TransactionDate <= firstDayOfNextMonth 
                     && t.UserId == userId
                     && t.Actived == true
                 )
