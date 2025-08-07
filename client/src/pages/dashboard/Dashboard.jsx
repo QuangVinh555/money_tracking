@@ -42,7 +42,7 @@ const Dashboard = () => {
   const { loadingBudgetsLimit, createBudgetsLimit } = useBudgetsLimit();
 
   // List data transactions call API
-  const { transactions, totalCard, totalCardByDate, createTransactions, loading, fetchTotalCardTransactions, fetchTotalCardByDateTransactions } = useTransactions(changeDate, selectedDate);
+  const { transactions, totalCard, totalCardByDate, createTransactions, loading, fetchTotalCardTransactions, fetchTotalCardByDateTransactions } = useTransactions(changeDate);
 
   // List data categories call API
   const { categories } = useCategories();

@@ -1,15 +1,8 @@
 import { Search, Filter, Plus } from "lucide-react";
-import { useState } from "react";
-
+import { useState, useMemo } from "react";
+import { formatToLocalDateString } from "../../utils/format";
 import useTransactions from "../../hook/transactions";
-
-const transactionsTest = [
-  { id: 1, date: "2024-06-19", description: "Cà phê Starbucks", category: "Ăn uống", amount: -185000, account: "Tiền mặt" },
-  { id: 2, date: "2024-06-18", description: "Xăng xe", category: "Di chuyển", amount: -800000, account: "Thẻ tín dụng" },
-  { id: 3, date: "2024-06-17", description: "Mua đồ ăn", category: "Ăn uống", amount: -450000, account: "Ví điện tử" },
-  { id: 4, date: "2024-06-15", description: "Lương tháng 6", category: "Thu nhập", amount: 25000000, account: "Ngân hàng" },
-  { id: 5, date: "2024-06-14", description: "Mua quần áo", category: "Mua sắm", amount: -1200000, account: "Thẻ tín dụng" },
-];
+import { TRANSACTIONS_TYPE } from "../../constants/common";
 
 export default function Transactions() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -22,9 +15,12 @@ export default function Transactions() {
     date: ""
   });
 
-  const { transactions } = useTransactions();
-  console.log(transactions)
-  
+const today = useMemo(() => formatToLocalDateString(new Date()), []);
+const { transactions } = useTransactions(today);
+  const allTransactions = transactions.data
+    ?.flatMap(group => group.transactions);
+  console.log('allTransactions', allTransactions)
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
@@ -88,21 +84,21 @@ export default function Transactions() {
             </div>
             <div className="p-6">
               <div className="space-y-4">
-                {transactionsTest.map((transaction) => (
-                  <div key={transaction.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                {allTransactions?.map((transaction) => (
+                  <div key={transaction.transactionId} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                     <div className="flex-1">
                       <div className="flex items-center gap-4">
                         <div className="flex-1">
                           <p className="font-medium text-gray-900">{transaction.description}</p>
                           <div className="flex items-center gap-2 mt-1">
-                            <span className="text-sm text-gray-500">{transaction.date}</span>
+                            <span className="text-sm text-gray-500">{transaction.transactionDate}</span>
                             <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">
                               {transaction.category}
                             </span>
-                            <span className="text-sm text-gray-500">• {transaction.account}</span>
+                            {/* <span className="text-sm text-gray-500">• {transaction.account}</span> */}
                           </div>
                         </div>
-                        <div className={`text-lg font-semibold ${transaction.amount > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        <div className={`text-lg font-semibold ${transaction.transactionType === TRANSACTIONS_TYPE.INCOME ? 'text-green-600' : 'text-red-600'}`}>
                           {transaction.amount > 0 ? '+' : ''}{formatCurrency(transaction.amount)}
                         </div>
                       </div>
@@ -124,19 +120,19 @@ export default function Transactions() {
                     <input
                       type="text"
                       value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Nhập mô tả giao dịch"
                       required
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Số tiền</label>
                     <input
                       type="number"
                       value={formData.amount}
-                      onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="0"
                       required
@@ -151,7 +147,7 @@ export default function Transactions() {
                           type="radio"
                           value="income"
                           checked={formData.type === "income"}
-                          onChange={(e) => setFormData({...formData, type: e.target.value})}
+                          onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                           className="mr-2"
                         />
                         Thu nhập
@@ -161,7 +157,7 @@ export default function Transactions() {
                           type="radio"
                           value="expense"
                           checked={formData.type === "expense"}
-                          onChange={(e) => setFormData({...formData, type: e.target.value})}
+                          onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                           className="mr-2"
                         />
                         Chi tiêu
@@ -173,7 +169,7 @@ export default function Transactions() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Danh mục</label>
                     <select
                       value={formData.category}
-                      onChange={(e) => setFormData({...formData, category: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       required
                     >
@@ -189,7 +185,7 @@ export default function Transactions() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Tài khoản</label>
                     <select
                       value={formData.account}
-                      onChange={(e) => setFormData({...formData, account: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, account: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       required
                     >
@@ -206,7 +202,7 @@ export default function Transactions() {
                     <input
                       type="date"
                       value={formData.date}
-                      onChange={(e) => setFormData({...formData, date: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       required
                     />
