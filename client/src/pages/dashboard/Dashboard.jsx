@@ -94,15 +94,16 @@ const Dashboard = () => {
   };
 
   // Thêm giao dịch transactions
-  const handleAddTransaction = (newTransaction) => {
-    createTransactions(newTransaction);
+  const handleAddTransaction = async (newTransaction) => {
+    await createTransactions(newTransaction);
+    await fetchTotalCardByDateTransactions(newTransaction.transaction_Date);
   };
 
   // Thêm hạn mức Budgets_limit
   const handleSetLimit = async (newLimit) => {
     await createBudgetsLimit(newLimit)
+    await fetchTotalCardTransactions();
     setLimitModalOpen(false);
-    fetchTotalCardTransactions();
   };
 
   return (
