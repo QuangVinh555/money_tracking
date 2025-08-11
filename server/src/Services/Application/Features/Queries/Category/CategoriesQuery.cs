@@ -32,6 +32,8 @@ namespace Application.Features.Queries.Category
             {
                 CategoryId = c.CategoryId,
                 CategoryName = c.CategoryName,
+                Index = c.Index,
+                Type = c.Type,
                 Actived = c.Actived,
                 Created_At = c.CreatedAt,
                 Updated_At = c.UpdatedAt,
