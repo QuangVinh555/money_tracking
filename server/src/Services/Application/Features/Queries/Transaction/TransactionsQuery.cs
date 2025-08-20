@@ -82,10 +82,33 @@ namespace Application.Features.Queries.Transaction
                 .Where(b => b.BudgetsLimitStartDate != null && b.BudgetsLimitStartDate.Value == fromDate && b.UserId == userId)
                 .FirstOrDefaultAsync();
 
-            // Chi tiêu trung bình / ngày(tính tới ngày hiện tại)
-            var toDateNow = DateOnly.FromDateTime(DateTime.UtcNow);
+            // --- Chi tiêu trung bình / ngày (loại bỏ category = 6) ---
+            var expenseWithoutRent = await _context.Transactions
+                .Where(t => t.TransactionType == 2
+                    && t.TransactionDate >= fromDate
+                    && t.TransactionDate <= toDate
+                    && t.UserId == userId
+                    && t.CategoryId != 6 // loại bỏ tiền trọ
+                )
+                .SumAsync(t => t.Amount);
+
+            // Xác định ngày cuối để tính trung bình
+            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+            DateOnly toDateNow;
+
+            if (OptionDate.Value.Year == today.Year && OptionDate.Value.Month == today.Month)
+            {
+                // Nếu là tháng hiện tại -> dùng hôm nay
+                toDateNow = today;
+            }
+            else
+            {
+                // Nếu là tháng khác -> dùng ngày cuối tháng đó
+                toDateNow = toDate;
+            }
+
             var totalDays = (toDateNow.ToDateTime(TimeOnly.MinValue) - fromDate.ToDateTime(TimeOnly.MinValue)).Days + 1;
-            var averageDailySpending = totalDays > 0 ? Math.Round((totalExpense ?? 0) / totalDays) : 0;
+            var averageDailySpending = totalDays > 0 ? Math.Round((expenseWithoutRent ?? 0) / totalDays) : 0;
 
             return new TransactionsTotalCardResponse
             {
