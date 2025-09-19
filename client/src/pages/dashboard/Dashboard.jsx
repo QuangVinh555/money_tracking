@@ -17,7 +17,6 @@ import useTransactions from "../../hook/transactions.js";
 import ProfileDropdown from "./ProfileDropdown.jsx";
 import { useNavigate } from "react-router-dom";
 import { formatToLocalDateString } from "../../utils/format.js";
-import useCategories from "../../hook/categories.js";
 import useBudgetsLimit from "../../hook/budgets_limit.js";
 import BudgetOverview from "../budgetOverview/BudgetOverview.jsx";
 const Dashboard = () => {
@@ -43,9 +42,6 @@ const Dashboard = () => {
 
   // List data transactions call API
   const { transactions, totalCard, totalCardByDate, createTransactions, loading, fetchTotalCardTransactions, fetchTotalCardByDateTransactions } = useTransactions(changeDate);
-
-  // List data categories call API
-  const { categories } = useCategories();
 
   // Popup thêm giao dịch
   const [isModalOpen, setModalOpen] = useState(false);
@@ -178,7 +174,6 @@ const Dashboard = () => {
         onClose={() => setModalOpen(false)}
         selectedDate={selectedDate}
         transactions={transactions}
-        categories={categories}
         totalCard={totalCardByDate}
         onAddTransaction={handleAddTransaction}
         isLoading={loading}

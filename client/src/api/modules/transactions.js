@@ -7,7 +7,7 @@ const transactionsApi = {
   getTotalCardByDate: (datetime) => axiosClient.get(`/transactions/total-card-by-date?OptionDate=${datetime}`),
   getById: (id) => axiosClient.get(`/transactions/${id}`),
   create: (data) => axiosClient.post('/transactions/create', data),
-  update: (id, data) => axiosClient.put(`/transactions/${id}`, data),
+  update: (id, data) => axiosClient.put(`/transactions/update/${id}`, data),
   delete: (id) => axiosClient.delete(`/transactions/${id}`),
 };
 

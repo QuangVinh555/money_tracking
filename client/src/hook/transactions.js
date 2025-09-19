@@ -108,6 +108,7 @@ export default function useTransactions(datetime) {
     updateTransactions,
     deleteTransactions,
     fetchTransactions,
+    fetchAllTransactions,
     fetchTotalCardTransactions,
     fetchTotalCardByDateTransactions
   };

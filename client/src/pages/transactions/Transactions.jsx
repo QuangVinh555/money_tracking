@@ -10,29 +10,31 @@ import TransactionModal from "../dashboard/TransactionModal";
 // --- ICON MAPPING ---
 // Map danh mục với icon tương ứng
 const categoryIcons = {
-    'Ăn uống': <Utensils size={20} className="text-orange-500" />,
-    'Mua sắm': <ShoppingCart size={20} className="text-blue-500" />,
-    'Di chuyển': <Car size={20} className="text-green-500" />,
-    'Nhà cửa': <Home size={20} className="text-purple-500" />,
-    'Lương': <DollarSign size={20} className="text-emerald-500" />,
-    'Default': <DollarSign size={20} className="text-gray-500" />,
+  'Ăn uống': <Utensils size={20} className="text-orange-500" />,
+  'Mua sắm': <ShoppingCart size={20} className="text-blue-500" />,
+  'Di chuyển': <Car size={20} className="text-green-500" />,
+  'Nhà cửa': <Home size={20} className="text-purple-500" />,
+  'Lương': <DollarSign size={20} className="text-emerald-500" />,
+  'Default': <DollarSign size={20} className="text-gray-500" />,
 };
 
 const getCategoryIcon = (category) => categoryIcons[category] || categoryIcons['Default'];
 
 export default function Transactions() {
+
+  const today = useMemo(() => formatToLocalDateString(new Date()), []);
+  // API Transactions
+  const { transactions, allTransactions, fetchAllTransactions, updateTransactions } = useTransactions(today);
+
   // const [searchTerm, setSearchTerm] = useState('');
   // const [typeFilter, setTypeFilter] = useState('all');
   // const [startDate, setStartDate] = useState('');
   // const [endDate, setEndDate] = useState('');
 
-  // const [isModalOpen, setModalOpen] = useState(false);
-  // const [transactionToEdit, setTransactionToEdit] = useState(null);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [transactionToEdit, setTransactionToEdit] = useState(null);
   const [transactionToDelete, setTransactionToDelete] = useState(null);
 
-  const today = useMemo(() => formatToLocalDateString(new Date()), []);
-  const { allTransactions } = useTransactions(today);
-  console.log('allTransactions', allTransactions);
   // const filteredTransactions = useMemo(() => {
   //   return transactions.data?.filter(tx => {
   //     const txDate = new Date(tx.date);
@@ -52,16 +54,22 @@ export default function Transactions() {
   //   }, { income: 0, expense: 0 });
   // }, [filteredTransactions]);
 
-  const openAddModal = () => { setTransactionToEdit(null); setModalOpen(true); };
-  const openEditModal = (tx) => { setTransactionToEdit(tx); setModalOpen(true); };
+  // const openAddModal = () => {
+  //   setTransactionToEdit(null);
+  //   setModalOpen(true);
+  // };
+
+  // Chỉnh sửa giao dịch
+  const openEditModal = (tx) => {
+    setTransactionToEdit(tx);
+    setModalOpen(true);
+  };
   const openDeleteConfirm = (tx) => { setTransactionToDelete(tx); };
 
-  const handleSaveTransaction = (txData) => {
-    const newTransactions = [...transactions];
-    const index = newTransactions.findIndex(t => t.id === txData.id);
-    if (index > -1) { newTransactions[index] = txData; }
-    else { newTransactions.unshift(txData); }
-    onDataChange(newTransactions);
+  const handleUpdateTransaction = async (transactionId, data) => {
+    await updateTransactions(transactionId, data);
+    await fetchAllTransactions();
+    setModalOpen(false);
   };
 
   const handleDeleteTransaction = () => {
@@ -102,10 +110,10 @@ export default function Transactions() {
                 <input type="date" onChange={e => setEndDate(e.target.value)} className="w-full border rounded-lg px-3 py-2" />
               </div>
             </div>
-            <button onClick={openAddModal} className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold px-4 py-2 rounded-lg hover:opacity-90 shadow-md">
+            {/* <button onClick={openAddModal} className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold px-4 py-2 rounded-lg hover:opacity-90 shadow-md">
               <PlusCircle size={18} />
               <span>Thêm giao dịch</span>
-            </button>
+            </button> */}
           </div>
         </div>
 
@@ -171,15 +179,14 @@ export default function Transactions() {
           </div>
         </div>
       </div>
-      {/* <TransactionModal
+      <TransactionModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
-        // categories={categories}
-        onSave={handleSaveTransaction}
+        onUpdateTransaction={handleUpdateTransaction}
         transactionToEdit={transactionToEdit}
-        selectedDate={new Date()}
+        selectedDate={transactionToEdit?.transactionDate}
       />
-      <ConfirmationModal
+      {/* <ConfirmationModal
         isOpen={!!transactionToDelete}
         onClose={() => setTransactionToDelete(null)}
         onConfirm={handleDeleteTransaction}
