@@ -68,9 +68,12 @@ namespace server.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPut("update")]
-        public async Task<IActionResult> UpdateTransaction([FromBody] UpdateTransactionsCommand request)
+        [HttpPut("update/{id}")]
+        public async Task<IActionResult> UpdateTransaction(int id, [FromBody] UpdateTransactionsCommand request)
         {
+            // đồng bộ id từ route vào request
+            request.TransactionId = id;
+
             var response = await _mediator.Send(request);
 
             if (response.Success)
