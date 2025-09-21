@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.Common.CurrentUser;
 using Core.Common;
 using Core.Extensions;
 using Infrastructure.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Application.Features.Commands.Transactions
 {
@@ -27,10 +28,12 @@ namespace Application.Features.Commands.Transactions
     public class UpdateTransactionsCommandHandler : IRequestHandler<UpdateTransactionsCommand, ApiResponse<bool>>
     {
         private readonly AppDbContext _context;
+        private readonly ICurrentUserService _currentUserService;
 
-        public UpdateTransactionsCommandHandler(AppDbContext context)
+        public UpdateTransactionsCommandHandler(AppDbContext context, ICurrentUserService currentUserService)
         {
             _context = context;
+            _currentUserService = currentUserService;
         }
         public async Task<ApiResponse<bool>> Handle(UpdateTransactionsCommand request, CancellationToken cancellationToken)
         {
@@ -39,7 +42,7 @@ namespace Application.Features.Commands.Transactions
                 var exitedTransaction = await _context.Transactions
                     .FirstOrDefaultAsync(t =>
                         t.TransactionId == request.TransactionId
-                        && t.UserId == request.UserId
+                        && t.UserId == _currentUserService.UserId
                         && t.Actived == true
                     );
 

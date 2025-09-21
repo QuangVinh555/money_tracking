@@ -27,6 +27,24 @@ namespace server.Controllers
         }
 
         /// <summary>
+        /// Lấy ra tất cả các giao dịch trong tháng hiện tại
+        /// </summary>
+        /// <param name="OptionDate"></param>
+        /// <returns></returns>
+        [HttpGet("get-all-transactions")]
+        public async Task<IActionResult> GetAllTransactions(DateOnly? OptionDate)
+        {
+            var data = await _transactionQuery.GetAllTransactions(OptionDate);
+
+            return Ok(new ApiResponse<List<TransactionsResponse>>
+            {
+                Success = true,
+                Data = data,
+                Message = "Lấy ra tất cả các giao dịch thành công"
+            });
+        }
+
+        /// <summary>
         /// Thêm mới giao dịch.
         /// </summary>
         /// <param name="request"></param>
@@ -50,9 +68,12 @@ namespace server.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPut("update")]
-        public async Task<IActionResult> UpdateTransaction([FromBody] UpdateTransactionsCommand request)
+        [HttpPut("update/{id}")]
+        public async Task<IActionResult> UpdateTransaction(int id, [FromBody] UpdateTransactionsCommand request)
         {
+            // đồng bộ id từ route vào request
+            request.TransactionId = id;
+
             var response = await _mediator.Send(request);
 
             if (response.Success)

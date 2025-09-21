@@ -34,6 +34,12 @@ namespace Application.Features.Queries.Transaction
         /// </summary>
         /// <returns></returns>
         public Task<List<TransactionsGroupByDateResponse>> GetTransactionsGroupByDate(DateOnly? OptionDate);
+
+        /// <summary>
+        /// Lấy ra tất cả các giao dịch trong tháng hiện tại
+        /// </summary>
+        /// <returns></returns>
+        public Task<List<TransactionsResponse>> GetAllTransactions(DateOnly? OptionDate);
     }
     public class TransactionsQuery : ITransactionQuery
     {
@@ -211,6 +217,49 @@ namespace Application.Features.Queries.Transaction
                 Income = totalIncome,
                 Expense = totalExpense,
             };
+        }
+
+        public async Task<List<TransactionsResponse>> GetAllTransactions(DateOnly? OptionDate)
+        {
+            var userId = 3;
+
+            // Lấy ngày hiện tại
+            var now = DateOnly.FromDateTime(DateTime.UtcNow);
+            var firstDayOfMonth = OptionDate.HasValue
+                ? DateTimeExtensions.ToStartOfMonth(OptionDate.Value)
+                : DateTimeExtensions.ToStartOfMonth(now);
+
+            var firstDayOfNextMonth = OptionDate.HasValue
+                ? DateTimeExtensions.ToEndOfMonth(OptionDate.Value)
+                : DateTimeExtensions.ToEndOfMonth(now);
+
+            var transactions = await _context.Transactions
+               .Where(t => t.TransactionDate >= firstDayOfMonth
+                   && t.TransactionDate <= firstDayOfNextMonth
+                   && t.UserId == userId
+                   && t.Actived == true
+               )
+               .Include(t => t.User)
+               .Include(t => t.Category)
+               .Select(t => new TransactionsResponse
+               {
+                   TransactionId = t.TransactionId,
+                   UserId = t.UserId,
+                   FullName = t.User.Fullname ?? "",
+                   CategoryId = t.CategoryId,
+                   CategoryName = t.Category.CategoryName ?? "",
+                   Description = t.Description ?? "",
+                   Amount = t.Amount,
+                   TransactionDate = t.TransactionDate,
+                   TransactionType = t.TransactionType,
+                   TransactionTypeName = t.TransactionType == 1 ? ConstTransactionType.INCOME : ConstTransactionType.EXPENSE,
+                   Actived = t.Actived,
+                   CreatedAt = t.CreatedAt,
+                   UpdateAt = t.UpdatedAt,
+               })
+               .OrderByDescending(t => t.TransactionDate)
+               .ToListAsync();
+            return transactions;
         }
     }
 }
