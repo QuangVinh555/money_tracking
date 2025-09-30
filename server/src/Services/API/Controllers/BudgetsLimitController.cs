@@ -3,6 +3,7 @@ using Application.Features.Commands.Transactions;
 using Application.Features.Queries.Transaction;
 using Infrastructure.Models;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,6 +11,7 @@ namespace server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class BudgetsLimitController : ControllerBase
     {
         private readonly AppDbContext _context;
