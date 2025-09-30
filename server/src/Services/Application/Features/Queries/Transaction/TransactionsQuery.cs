@@ -187,7 +187,7 @@ namespace Application.Features.Queries.Transaction
 
         public async Task<TransactionsTotalCardResponse> TransactionsTotalCardByOptionDate(DateOnly? OptionDate)
         {
-            var userId = 3;
+            var userId = _currentUser.UserId;
 
             // Không có value thì lấy ngày tháng hiện tại
             if (!OptionDate.HasValue)
@@ -221,7 +221,7 @@ namespace Application.Features.Queries.Transaction
 
         public async Task<List<TransactionsResponse>> GetAllTransactions(DateOnly? OptionDate)
         {
-            var userId = 3;
+            var userId = _currentUser.UserId;
 
             // Lấy ngày hiện tại
             var now = DateOnly.FromDateTime(DateTime.UtcNow);
