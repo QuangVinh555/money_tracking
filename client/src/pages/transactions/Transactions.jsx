@@ -1,5 +1,8 @@
 import { Search, PlusCircle, ChevronLeft, ChevronRight, Edit, Trash2 } from "lucide-react";
-import { DollarSign, ShoppingCart, Utensils, Car, Home } from 'lucide-react';
+import { 
+  Utensils, ShoppingCart, Car, Home, DollarSign, 
+  Gamepad2, AlertCircle, Briefcase, Building2
+} from "lucide-react";
 import { useState, useMemo } from "react";
 import { formatToLocalDateString } from "../../utils/format";
 import useTransactions from "../../hook/transactions";
@@ -11,10 +14,14 @@ import TransactionModal from "../dashboard/TransactionModal";
 // Map danh mục với icon tương ứng
 const categoryIcons = {
   'Ăn uống': <Utensils size={20} className="text-orange-500" />,
+  'Giải trí': <Gamepad2 size={20} className="text-pink-500" />,
   'Mua sắm': <ShoppingCart size={20} className="text-blue-500" />,
-  'Di chuyển': <Car size={20} className="text-green-500" />,
-  'Nhà cửa': <Home size={20} className="text-purple-500" />,
   'Lương': <DollarSign size={20} className="text-emerald-500" />,
+  'Di chuyển': <Car size={20} className="text-green-500" />,
+  'Chi phí phát sinh': <AlertCircle size={20} className="text-red-500" />,
+  'Thu nhập thêm': <Briefcase size={20} className="text-indigo-500" />,
+  'Tiền thuê trọ': <Building2 size={20} className="text-yellow-600" />,
+  'Chi phí sinh hoạt': <Home size={20} className="text-purple-500" />,
   'Default': <DollarSign size={20} className="text-gray-500" />,
 };
 

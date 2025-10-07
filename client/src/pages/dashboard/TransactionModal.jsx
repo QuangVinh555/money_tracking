@@ -1,29 +1,26 @@
 import { useState, useEffect } from "react";
 import { formatCurrency, formatDate, formatToLocalDateString } from "../../utils/format";
 import {
-  DollarSign,
-  ShoppingCart,
-  Utensils,
-  Car,
-  Home,
-  Building2,
-  Wallet,
   X,
-  Loader2
+  Loader2,
+  Utensils, ShoppingCart, Car, Home, DollarSign,
+  Gamepad2, AlertCircle, Briefcase, Building2
 } from "lucide-react";
 import { TRANSACTIONS_TYPE } from "../../constants/common";
 import useCategories from "../../hook/categories"
 
 // --- ICON MAPPING ---
 const categoryIcons = {
-  "Ăn uống": <Utensils size={20} className="text-orange-500" />,
-  "Mua sắm": <ShoppingCart size={20} className="text-blue-500" />,
-  "Di chuyển": <Car size={20} className="text-green-500" />,
-  "Nhà cửa": <Home size={20} className="text-purple-500" />,
-  "Lương": <DollarSign size={20} className="text-emerald-500" />,
-  "Đóng tiền trọ": <Building2 size={20} className="text-pink-500" />,
-  "Chi phí khác": <Wallet size={20} className="text-yellow-500" />,
-  "Default": <DollarSign size={20} className="text-gray-500" />,
+  'Ăn uống': <Utensils size={20} className="text-orange-500" />,
+  'Giải trí': <Gamepad2 size={20} className="text-pink-500" />,
+  'Mua sắm': <ShoppingCart size={20} className="text-blue-500" />,
+  'Lương': <DollarSign size={20} className="text-emerald-500" />,
+  'Di chuyển': <Car size={20} className="text-green-500" />,
+  'Chi phí phát sinh': <AlertCircle size={20} className="text-red-500" />,
+  'Thu nhập thêm': <Briefcase size={20} className="text-indigo-500" />,
+  'Tiền thuê trọ': <Building2 size={20} className="text-yellow-600" />,
+  'Chi phí sinh hoạt': <Home size={20} className="text-purple-500" />,
+  'Default': <DollarSign size={20} className="text-gray-500" />,
 };
 const getCategoryIcon = (category) =>
   categoryIcons[category] || categoryIcons["Default"];
@@ -106,8 +103,8 @@ const TransactionModal = ({
       transaction_Type: txType,
       description,
     };
-    transactionToEdit 
-      ? onUpdateTransaction(transactionToEdit.transactionId ,newTransaction) 
+    transactionToEdit
+      ? onUpdateTransaction(transactionToEdit.transactionId, newTransaction)
       : onAddTransaction(newTransaction);
     // Reset form
     setTxType(TRANSACTIONS_TYPE.EXPENSE);
