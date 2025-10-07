@@ -88,7 +88,7 @@ export default function Transactions() {
 
   return (
     <>
-      <div className="bg-white p-6 rounded-2xl shadow-lg">
+      <div className="bg-gray-100 p-6 rounded-2xl">
         <div className="p-4 rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 border border-gray-200 mb-6">
           <div className="mb-8 flex justify-between items-center">
             <h1 className="text-3xl font-bold text-gray-900">Quản lý giao dịch</h1>
