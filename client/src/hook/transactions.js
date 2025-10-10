@@ -82,8 +82,15 @@ export default function useTransactions(datetime) {
 
   // Xóa giao dịch
   const deleteTransactions = async (id) => {
-    await transactionsApi.delete(id);
-    await fetchTransactions();
+    try {
+      setLoading(true);
+      await transactionsApi.delete(id);
+      await fetchTransactions();  
+    } catch (err) {
+      console.error('Lỗi xóa transactions:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Render danh sách giao dịch được nhóm theo từng ngày trong tháng
