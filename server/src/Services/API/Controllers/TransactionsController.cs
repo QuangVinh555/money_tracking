@@ -86,6 +86,28 @@ namespace server.Controllers
         }
 
         /// <summary>
+        /// Xóa giao dịch.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> DeleteTransaction(int id)
+        {
+            // đồng bộ id từ route vào request
+            var request = new DeleteTransactionsCommand { TransactionId = id };
+
+            var response = await _mediator.Send(request);
+
+            if (response.Success)
+                return Ok(response); // 200
+
+            if (response.Errors != null && response.Errors.Any())
+                return BadRequest(response); // 400
+
+            return StatusCode(500, response); // fallback
+        }
+
+        /// <summary>
         /// Tính tổng các card.
         /// </summary>
         /// <param name="OptionDate"></param>
