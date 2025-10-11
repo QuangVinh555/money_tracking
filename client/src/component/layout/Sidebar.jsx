@@ -47,6 +47,7 @@ const Sidebar = ({ isMobileMenuOpen, setMobileMenuOpen }) => {
                 <li key={item.name}>
                   <Link
                     to={item.path}
+                    onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isActive
                         ? "bg-blue-50 text-blue-600 font-bold"
                         : "hover:bg-gray-100 text-gray-600"
