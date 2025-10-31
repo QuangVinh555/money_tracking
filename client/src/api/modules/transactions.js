@@ -8,7 +8,7 @@ const transactionsApi = {
   getById: (id) => axiosClient.get(`/transactions/${id}`),
   create: (data) => axiosClient.post('/transactions/create', data),
   update: (id, data) => axiosClient.put(`/transactions/update/${id}`, data),
-  delete: (id) => axiosClient.delete(`/transactions/${id}`),
+  delete: (id) => axiosClient.delete(`/transactions/delete/${id}`),
 };
 
 export default transactionsApi;

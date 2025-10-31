@@ -1,6 +1,6 @@
 import { Search, PlusCircle, ChevronLeft, ChevronRight, Edit, Trash2 } from "lucide-react";
-import { 
-  Utensils, ShoppingCart, Car, Home, DollarSign, 
+import {
+  Utensils, ShoppingCart, Car, Home, DollarSign,
   Gamepad2, AlertCircle, Briefcase, Building2
 } from "lucide-react";
 import { useState, useMemo } from "react";
@@ -31,7 +31,7 @@ export default function Transactions() {
 
   const today = useMemo(() => formatToLocalDateString(new Date()), []);
   // API Transactions
-  const { transactions, allTransactions, fetchAllTransactions, updateTransactions } = useTransactions(today);
+  const { loading, transactions, allTransactions, fetchAllTransactions, updateTransactions, deleteTransactions } = useTransactions(today);
 
   // const [searchTerm, setSearchTerm] = useState('');
   // const [typeFilter, setTypeFilter] = useState('all');
@@ -66,23 +66,25 @@ export default function Transactions() {
   //   setModalOpen(true);
   // };
 
-  // Chỉnh sửa giao dịch
+  // Mở modal chỉnh sửa giao dịch
   const openEditModal = (tx) => {
     setTransactionToEdit(tx);
     setModalOpen(true);
   };
-  const openDeleteConfirm = (tx) => { setTransactionToDelete(tx); };
-
+  // Chỉnh sửa giao dịch -> Gọi API
   const handleUpdateTransaction = async (transactionId, data) => {
     await updateTransactions(transactionId, data);
     await fetchAllTransactions();
     setModalOpen(false);
   };
 
-  const handleDeleteTransaction = () => {
+  // Mở modal xóa giao dịch
+  const openDeleteConfirm = (tx) => { setTransactionToDelete(tx); };
+  // Xóa giao dịch -> Gọi API
+  const handleDeleteTransaction = async () => {
     if (!transactionToDelete) return;
-    const newTransactions = transactions.filter(t => t.id !== transactionToDelete.id);
-    onDataChange(newTransactions);
+    await deleteTransactions(transactionToDelete.transactionId);
+    await fetchAllTransactions();
     setTransactionToDelete(null);
   };
 
@@ -193,14 +195,21 @@ export default function Transactions() {
         transactionToEdit={transactionToEdit}
         selectedDate={transactionToEdit?.transactionDate}
       />
-      {/* <ConfirmationModal
+      <ConfirmationModal
         isOpen={!!transactionToDelete}
         onClose={() => setTransactionToDelete(null)}
         onConfirm={handleDeleteTransaction}
         title="Xác nhận Xóa Giao dịch"
+        loading={loading}
       >
-        <p>Bạn có chắc chắn muốn xóa giao dịch này không? Hành động này không thể hoàn tác.</p>
-      </ConfirmationModal> */}
+        <p>
+          Bạn có chắc chắn muốn xóa giao dịch
+          <span className="mx-1 font-semibold text-red-600">
+            ({transactionToDelete?.description}) 
+          </span> 
+          này không? Hành động này không thể hoàn tác.
+        </p>      
+      </ConfirmationModal>
     </>
   );
 }

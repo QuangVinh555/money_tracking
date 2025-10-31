@@ -1,6 +1,6 @@
 import React from "react";
 import { DollarSign, LayoutDashboard, Repeat, CreditCard, Wallet, Gem } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const menuItems = [
   { name: "Tổng quan", icon: <LayoutDashboard />, path: "/" },
@@ -45,8 +45,9 @@ const Sidebar = ({ isMobileMenuOpen, setMobileMenuOpen }) => {
               const isActive = location.pathname === item.path;
               return (
                 <li key={item.name}>
-                  <a
-                    href={item.path}
+                  <Link
+                    to={item.path}
+                    onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isActive
                         ? "bg-blue-50 text-blue-600 font-bold"
                         : "hover:bg-gray-100 text-gray-600"
@@ -57,7 +58,7 @@ const Sidebar = ({ isMobileMenuOpen, setMobileMenuOpen }) => {
                       className: isActive ? "text-blue-600" : "text-gray-500",
                     })}
                     <span>{item.name}</span>
-                  </a>
+                  </Link>
                 </li>
               );
             })}
