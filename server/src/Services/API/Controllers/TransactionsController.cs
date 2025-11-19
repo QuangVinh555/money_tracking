@@ -1,7 +1,9 @@
 ﻿using Application.Common.CurrentUser;
 using Application.Features.Commands.Transactions;
+using Application.Features.DTOs.PagedResult;
 using Application.Features.DTOs.Transactions;
 using Application.Features.Queries.Transaction;
+using Application.Features.QueryRequestModels.Transactions;
 using Core.Common;
 using Infrastructure.Models;
 using MediatR;
@@ -32,11 +34,11 @@ namespace server.Controllers
         /// <param name="OptionDate"></param>
         /// <returns></returns>
         [HttpGet("get-all-transactions")]
-        public async Task<IActionResult> GetAllTransactions(DateOnly? OptionDate)
+        public async Task<IActionResult> GetAllTransactions(DateOnly? OptionDate, int PageNumber = 1, int PageSize = 10)
         {
-            var data = await _transactionQuery.GetAllTransactions(OptionDate);
+            var data = await _transactionQuery.GetAllTransactions(OptionDate, PageNumber, PageSize);
 
-            return Ok(new ApiResponse<List<TransactionsResponse>>
+            return Ok(new ApiResponse<PagedResult<TransactionsResponse>>
             {
                 Success = true,
                 Data = data,
@@ -158,6 +160,25 @@ namespace server.Controllers
                 Success = true,
                 Data = data,
                 Message = $"Tổng số card ngày {OptionDate?.ToString("yyyy-MM-dd") ?? "không xác định"} đã được tính thành công."
+
+            });
+        }
+
+        /// <summary>
+        /// Tìm kiếm giao dịch
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpGet("search")]
+        public async Task<IActionResult> TransactionSearchQuery([FromQuery] TransactionsSearchQuery request)
+        {
+            var data = await _transactionQuery.SearchTransactions(request);
+
+            return Ok(new ApiResponse<PagedResult<TransactionsResponse>>
+            {
+                Success = true,
+                Data = data,
+                Message = "Lấy ra các giao dịch thành công."
 
             });
         }

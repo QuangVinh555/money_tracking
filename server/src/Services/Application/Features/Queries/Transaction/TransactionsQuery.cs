@@ -1,14 +1,18 @@
-﻿using System;
+﻿using Application.Common.CurrentUser;
+using Application.Features.DTOs.PagedResult;
+using Application.Features.DTOs.Transactions;
+using Application.Features.QueryRequestModels.Transactions;
+using Core.Constanst;
+using Core.Extensions;
+using Infrastructure.Models;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Application.Common.CurrentUser;
-using Application.Features.DTOs.Transactions;
-using Core.Constanst;
-using Core.Extensions;
-using Infrastructure.Models;
-using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Application.Features.Queries.Transaction
@@ -39,7 +43,14 @@ namespace Application.Features.Queries.Transaction
         /// Lấy ra tất cả các giao dịch trong tháng hiện tại
         /// </summary>
         /// <returns></returns>
-        public Task<List<TransactionsResponse>> GetAllTransactions(DateOnly? OptionDate);
+        public Task<PagedResult<TransactionsResponse>> GetAllTransactions(DateOnly? OptionDate, int PageNumber, int PageSize);
+
+        /// <summary>
+        /// Tìm kiếm giao dịch
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public Task<PagedResult<TransactionsResponse>> SearchTransactions(TransactionsSearchQuery request);
     }
     public class TransactionsQuery : ITransactionQuery
     {
@@ -219,7 +230,7 @@ namespace Application.Features.Queries.Transaction
             };
         }
 
-        public async Task<List<TransactionsResponse>> GetAllTransactions(DateOnly? OptionDate)
+        public async Task<PagedResult<TransactionsResponse>> GetAllTransactions(DateOnly? OptionDate, int PageNumber, int PageSize)
         {
             var userId = _currentUser.UserId;
 
@@ -258,8 +269,108 @@ namespace Application.Features.Queries.Transaction
                    UpdateAt = t.UpdatedAt,
                })
                .OrderByDescending(t => t.TransactionDate)
+               .Skip((PageNumber - 1) * PageSize)
+               .Take(PageSize)
                .ToListAsync();
-            return transactions;
+
+            // Tổng số bản ghi
+            var totalCount = transactions.Count();
+
+            // Trả về kết quả phân trang
+            return new PagedResult<TransactionsResponse>
+            {
+                Items = transactions,
+                TotalCount = totalCount,
+                PageNumber = PageNumber,
+                PageSize = PageSize
+            };
+        }
+
+        public async Task<PagedResult<TransactionsResponse>> SearchTransactions(TransactionsSearchQuery request)
+        {
+            var userId = _currentUser.UserId;
+
+            var query =  _context.Transactions
+                .Where(t => t.UserId == userId) // lọc theo user
+                .AsQueryable();
+
+            // Lọc theo FromDate – ToDate
+            if (request.FromDate.HasValue)
+            {
+                var from = request.FromDate.Value;
+                query = query.Where(t => t.TransactionDate >= from);
+            }
+
+            if (request.ToDate.HasValue)
+            {
+                var to = request.ToDate.Value;
+                query = query.Where(t => t.TransactionDate <= to);
+            }
+
+            // Lọc theo CategoryId
+            if (request.CategoryId.HasValue)
+            {
+                query = query.Where(t => t.CategoryId == request.CategoryId.Value);
+            }
+
+            // Lọc theo TransactionType (1 = income, 2 = expense)
+            if (request.TransactionType.HasValue)
+            {
+                query = query.Where(t => t.TransactionType == request.TransactionType.Value);
+            }
+
+            // Lọc theo mô tả (chứa chuỗi)
+            if (!string.IsNullOrWhiteSpace(request.Descriptions))
+            {
+                var keyword = request.Descriptions.Trim().ToLower();
+                query = query.Where(t => t.Description != null && t.Description.ToLower().Contains(keyword));
+            }
+            // Filter xong, query vẫn là IQueryable
+            var filteredQuery = query;
+
+            // Tính tổng thu nhập
+            var totalIncome = await filteredQuery
+                .Where(t => t.TransactionType == 1)
+                .SumAsync(t => t.Amount);
+
+            // Tính tổng chi tiêu
+            var totalExpense = await filteredQuery
+                .Where(t => t.TransactionType == 2)
+                .SumAsync(t => t.Amount);
+
+
+            // Tổng số bản ghi trước khi phân trang
+            var totalCount = await filteredQuery.CountAsync();
+
+            // Lấy list transactions
+            var transactions = await filteredQuery
+                .OrderByDescending(t => t.TransactionDate)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .Select(t => new TransactionsResponse
+                {
+                    TransactionId = t.TransactionId,
+                    UserId = userId,
+                    CategoryId = t.CategoryId,
+                    CategoryName = t.Category.CategoryName,
+                    Amount = t.Amount,
+                    TransactionType = t.TransactionType,
+                    TransactionTypeName = t.TransactionType == 1 ? ConstTransactionType.INCOME : ConstTransactionType.EXPENSE,
+                    Description = t.Description ?? "",
+                    TransactionDate = t.TransactionDate,
+                    Income = totalIncome,
+                    Expense = totalExpense,
+                })
+                .ToListAsync();
+
+            // Trả về DTO kèm tổng số, phân trang
+            return new PagedResult<TransactionsResponse>
+            {
+                Items = transactions,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
         }
     }
 }
