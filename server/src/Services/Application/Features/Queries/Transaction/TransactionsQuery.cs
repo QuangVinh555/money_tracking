@@ -244,7 +244,7 @@ namespace Application.Features.Queries.Transaction
                 ? DateTimeExtensions.ToEndOfMonth(OptionDate.Value)
                 : DateTimeExtensions.ToEndOfMonth(now);
 
-            var transactions = await _context.Transactions
+            var query = await _context.Transactions
                .Where(t => t.TransactionDate >= firstDayOfMonth
                    && t.TransactionDate <= firstDayOfNextMonth
                    && t.UserId == userId
@@ -269,13 +269,11 @@ namespace Application.Features.Queries.Transaction
                    UpdateAt = t.UpdatedAt,
                })
                .OrderByDescending(t => t.TransactionDate)
-               .Skip((PageNumber - 1) * PageSize)
-               .Take(PageSize)
                .ToListAsync();
 
             // Tổng số bản ghi
-            var totalCount = transactions.Count();
-
+            var totalCount = query.Count();
+            var transactions = query.Skip((PageNumber - 1) * PageSize).Take(PageSize).ToList();
             // Trả về kết quả phân trang
             return new PagedResult<TransactionsResponse>
             {
@@ -289,23 +287,18 @@ namespace Application.Features.Queries.Transaction
         public async Task<PagedResult<TransactionsResponse>> SearchTransactions(TransactionsSearchQuery request)
         {
             var userId = _currentUser.UserId;
+            // Lấy ngày hiện tại
+            var now = DateOnly.FromDateTime(DateTime.UtcNow);
+
+            // Tính ngày mặc định
+            var fromDate = request.FromDate ?? DateTimeExtensions.ToStartOfMonth(now);
+            var toDate = request.ToDate ?? DateTimeExtensions.ToEndOfMonth(now);
 
             var query =  _context.Transactions
                 .Where(t => t.UserId == userId) // lọc theo user
+                .Where(t => t.TransactionDate >= fromDate && t.TransactionDate <= toDate)
+                .Where(t=> t.Actived == true)
                 .AsQueryable();
-
-            // Lọc theo FromDate – ToDate
-            if (request.FromDate.HasValue)
-            {
-                var from = request.FromDate.Value;
-                query = query.Where(t => t.TransactionDate >= from);
-            }
-
-            if (request.ToDate.HasValue)
-            {
-                var to = request.ToDate.Value;
-                query = query.Where(t => t.TransactionDate <= to);
-            }
 
             // Lọc theo CategoryId
             if (request.CategoryId.HasValue)
@@ -350,14 +343,18 @@ namespace Application.Features.Queries.Transaction
                 .Select(t => new TransactionsResponse
                 {
                     TransactionId = t.TransactionId,
-                    UserId = userId,
+                    UserId = t.UserId,
+                    FullName = t.User.Fullname ?? "",
                     CategoryId = t.CategoryId,
-                    CategoryName = t.Category.CategoryName,
+                    CategoryName = t.Category.CategoryName ?? "",
+                    Description = t.Description ?? "",
                     Amount = t.Amount,
+                    TransactionDate = t.TransactionDate,
                     TransactionType = t.TransactionType,
                     TransactionTypeName = t.TransactionType == 1 ? ConstTransactionType.INCOME : ConstTransactionType.EXPENSE,
-                    Description = t.Description ?? "",
-                    TransactionDate = t.TransactionDate,
+                    Actived = t.Actived,
+                    CreatedAt = t.CreatedAt,
+                    UpdateAt = t.UpdatedAt,
                     Income = totalIncome,
                     Expense = totalExpense,
                 })

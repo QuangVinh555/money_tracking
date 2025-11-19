@@ -12,7 +12,7 @@ namespace Application.Features.QueryRequestModels.Transactions
         public DateOnly? ToDate { get; set; }
         public int? CategoryId { get; set; }
         public int? TransactionType { get; set; }
-        public string Descriptions { get; set; } = string.Empty;
+        public string? Descriptions { get; set; } = string.Empty;
 
 
         // Phân trang
