@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.Features.DTOs.Transactions
 {
-    public class TransactionsResponse
+    public class TransactionsResponse : TransactionsTotalCardResponse
     {
         public int TransactionId { get; set; }
         public int UserId { get; set; }
