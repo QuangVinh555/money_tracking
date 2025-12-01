@@ -62,5 +62,28 @@ export const formatToLocalDateString = (date) => {
     return `${year}-${month}-${day}`;
 };
 
+// --- HELPER FUNCTIONS ---
+// Lấy ngày đầu tiên của tháng hiện tại, trả về string "YYYY-MM-DD"
+export const getFirstDayOfCurrentMonth = () => {
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    const yyyy = firstDay.getFullYear();
+    const mm = String(firstDay.getMonth() + 1).padStart(2, '0');
+    const dd = String(firstDay.getDate()).padStart(2, '0');
+
+    return `${yyyy}-${mm}-${dd}`;
+};
+
+// Lấy ngày hôm nay, trả về string "YYYY-MM-DD"
+export const getTodayDate = () => {
+    const today = new Date();
+
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+
+    return `${yyyy}-${mm}-${dd}`;
+};
 
 

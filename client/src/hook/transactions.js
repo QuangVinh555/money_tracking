@@ -13,10 +13,10 @@ export default function useTransactions(datetime) {
   // Loading
   const [loading, setLoading] = useState(false);
 
-  // Lấy ra tất cả giao dịch trong tháng hiện tại
-  const fetchAllTransactions = async () => {
+  // Lấy ra tất cả giao dịch trong tháng hiện tại -> mới bổ sung thêm tìm kiếm
+  const fetchAllTransactions = async (pageNumber, pageSize, params = {}) => {
     try {
-      const res = await transactionsApi.getAllTransactions(datetime);
+      const res = await transactionsApi.getSearchTransactions({ pageNumber, pageSize, ...params });
       setAllTransactions(res.data);
     } catch (err) {
       console.error('Lỗi fetch transactions:', err);

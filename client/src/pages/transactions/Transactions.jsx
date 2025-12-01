@@ -3,8 +3,8 @@ import {
   Utensils, ShoppingCart, Car, Home, DollarSign,
   Gamepad2, AlertCircle, Briefcase, Building2
 } from "lucide-react";
-import { useState, useMemo } from "react";
-import { formatToLocalDateString } from "../../utils/format";
+import { useState, useMemo, useEffect } from "react";
+import { formatToLocalDateString, getFirstDayOfCurrentMonth, getTodayDate } from "../../utils/format";
 import useTransactions from "../../hook/transactions";
 import { TRANSACTIONS_TYPE } from "../../constants/common";
 import ConfirmationModal from "../../component/modals/ConfirmationModal";
@@ -31,40 +31,51 @@ export default function Transactions() {
 
   const today = useMemo(() => formatToLocalDateString(new Date()), []);
   // API Transactions
-  const { loading, transactions, allTransactions, fetchAllTransactions, updateTransactions, deleteTransactions } = useTransactions(today);
-
-  // const [searchTerm, setSearchTerm] = useState('');
-  // const [typeFilter, setTypeFilter] = useState('all');
-  // const [startDate, setStartDate] = useState('');
-  // const [endDate, setEndDate] = useState('');
+  const { loading, allTransactions, fetchAllTransactions, updateTransactions, deleteTransactions } = useTransactions(today);
+  
+  // Pagination state(mặc định trang 1, 10 item/trang)
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  // const initialQueryParams = useMemo(() => ({
+  //   descriptions: "",
+  //   transactionType: "",
+  //   fromDate: getFirstDayOfCurrentMonth(),
+  //   toDate: getTodayDate(),
+  // }), []);
+  // const [queryParams, setQueryParams] = useState(initialQueryParams);
+  const [queryParams, setQueryParams] = useState({
+    descriptions: "",
+    transactionType: "",
+    fromDate: getFirstDayOfCurrentMonth(),
+    toDate: getTodayDate(),
+  });
+  // Input tìm kiếm (debounce) descriptions
+  const [descriptionsInput, setDescriptionsInput] = useState('');
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [transactionToEdit, setTransactionToEdit] = useState(null);
   const [transactionToDelete, setTransactionToDelete] = useState(null);
 
-  // const filteredTransactions = useMemo(() => {
-  //   return transactions.data?.filter(tx => {
-  //     const txDate = new Date(tx.date);
-  //     if (searchTerm && !tx.description.toLowerCase().includes(searchTerm.toLowerCase())) return false;
-  //     if (typeFilter !== 'all' && tx.type !== typeFilter) return false;
-  //     if (startDate && txDate < new Date(startDate)) return false;
-  //     if (endDate && txDate > new Date(endDate)) return false;
-  //     return true;
-  //   });
-  // }, [transactions, searchTerm, typeFilter, startDate, endDate]);
+  // Reset về trang 1 khi filter thay đổi
+  useEffect(() => {
+    setPageNumber(1);
+    setPageSize(10) // thêm để khỏi bị warning
+  }, [queryParams]);
 
-  // const filteredTotal = useMemo(() => {
-  //   return filteredTransactions?.reduce((acc, tx) => {
-  //     if (tx.type === 'income') acc.income += tx.amount;
-  //     else acc.expense += tx.amount;
-  //     return acc;
-  //   }, { income: 0, expense: 0 });
-  // }, [filteredTransactions]);
+  // Debounce cho input descriptions
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      // Cập nhật queryParams khi người dùng ngừng gõ 500ms
+      setQueryParams(prev => ({ ...prev, descriptions: descriptionsInput }));
+    }, 500); // 700ms là thời gian chờ, có thể chỉnh
 
-  // const openAddModal = () => {
-  //   setTransactionToEdit(null);
-  //   setModalOpen(true);
-  // };
+    return () => clearTimeout(handler); // clear timeout nếu user gõ tiếp
+  }, [descriptionsInput]);
+
+  // Khi pageNumber hoặc pageSize thay đổi thì fetch lại data
+  useEffect(() => {
+    fetchAllTransactions(pageNumber, pageSize, queryParams);
+  }, [pageNumber, pageSize, queryParams]);
 
   // Mở modal chỉnh sửa giao dịch
   const openEditModal = (tx) => {
@@ -74,7 +85,7 @@ export default function Transactions() {
   // Chỉnh sửa giao dịch -> Gọi API
   const handleUpdateTransaction = async (transactionId, data) => {
     await updateTransactions(transactionId, data);
-    await fetchAllTransactions();
+    await fetchAllTransactions(pageNumber, pageSize, queryParams);
     setModalOpen(false);
   };
 
@@ -84,8 +95,28 @@ export default function Transactions() {
   const handleDeleteTransaction = async () => {
     if (!transactionToDelete) return;
     await deleteTransactions(transactionToDelete.transactionId);
-    await fetchAllTransactions();
+    await fetchAllTransactions(pageNumber, pageSize, queryParams);
     setTransactionToDelete(null);
+  };
+
+  // Tính toán thông tin phân trang
+  const pagination = useMemo(() => {
+    const totalCount = allTransactions.data?.totalCount || 0;
+    const totalPages = allTransactions.data?.totalPages || 1;
+    // Tính toán startItem và endItem dựa trên pageNumber, pageSize và totalCount
+    const startItem = totalCount === 0 ? 0 : (pageNumber - 1) * pageSize + 1;
+    const endItem = Math.min(pageNumber * pageSize, totalCount);
+
+    return { totalCount, totalPages, startItem, endItem };
+  }, [allTransactions.data, pageNumber, pageSize]);
+
+  const gotoPage = (p) => {
+    if (p < 1 || p > pagination.totalPages) return;
+    setPageNumber(p);
+  };
+
+  const handleQueryParamChange = (key, value) => {
+    setQueryParams(prev => ({ ...prev, [key]: value }));
   };
 
   return (
@@ -99,41 +130,57 @@ export default function Transactions() {
             <div className="relative">
               <label className="text-sm font-semibold text-gray-600 mb-1 block">Tìm kiếm</label>
               <Search className="absolute left-3 top-10 text-gray-400" size={20} />
-              <input type="text" placeholder="Tên giao dịch..." onChange={e => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500" />
+              <input 
+                type="text" 
+                placeholder="Tên giao dịch..." 
+                value={descriptionsInput}
+                onChange={e => setDescriptionsInput(e.target.value)} 
+                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500" 
+              />            
             </div>
             <div>
               <label className="text-sm font-semibold text-gray-600 mb-1 block">Loại giao dịch</label>
-              <select onChange={e => setTypeFilter(e.target.value)} className="w-full px-3 py-2 border rounded-lg bg-white focus:ring-purple-500 focus:border-purple-500">
-                <option value="all">Tất cả</option>
-                <option value="income">Thu nhập</option>
-                <option value="expense">Chi tiêu</option>
+              <select 
+                value={queryParams.transactionType}
+                onChange={e => handleQueryParamChange('transactionType', e.target.value)} 
+                className="w-full px-3 py-2 border rounded-lg bg-white focus:ring-purple-500 focus:border-purple-500"
+              >                
+                <option value="">Tất cả</option>
+                <option value="1">Thu nhập</option>
+                <option value="2">Chi tiêu</option>
               </select>
             </div>
             <div className="flex items-center gap-2">
               <div>
                 <label className="text-sm font-semibold text-gray-600 mb-1 block">Từ ngày</label>
-                <input type="date" onChange={e => setStartDate(e.target.value)} className="w-full border rounded-lg px-3 py-2" />
+                <input 
+                  type="date" 
+                  value={queryParams.fromDate}
+                  onChange={e => handleQueryParamChange('fromDate', e.target.value)} 
+                  className="w-full border rounded-lg px-3 py-2" 
+                />
               </div>
               <div>
                 <label className="text-sm font-semibold text-gray-600 mb-1 block">Đến ngày</label>
-                <input type="date" onChange={e => setEndDate(e.target.value)} className="w-full border rounded-lg px-3 py-2" />
+                <input 
+                  type="date" 
+                  value={queryParams.toDate}
+                  onChange={e => handleQueryParamChange('toDate', e.target.value)} 
+                  className="w-full border rounded-lg px-3 py-2" 
+                />              
               </div>
             </div>
-            {/* <button onClick={openAddModal} className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold px-4 py-2 rounded-lg hover:opacity-90 shadow-md">
-              <PlusCircle size={18} />
-              <span>Thêm giao dịch</span>
-            </button> */}
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="bg-green-100 border border-green-200 p-4 rounded-lg">
             <p className="text-sm text-green-800 font-semibold">Tổng thu nhập (lọc)</p>
-            <p className="text-xl font-bold text-green-700">{10000000}</p>
+            <p className="text-xl font-bold text-green-700">{allTransactions.data?.items[0]?.income ?? 0}</p>
           </div>
           <div className="bg-red-100 border border-red-200 p-4 rounded-lg">
             <p className="text-sm text-red-800 font-semibold">Tổng chi tiêu (lọc)</p>
-            <p className="text-xl font-bold text-red-700">{5000000}</p>
+            <p className="text-xl font-bold text-red-700">{allTransactions.data?.items[0]?.expense ?? 0}</p>
           </div>
         </div>
 
@@ -149,7 +196,7 @@ export default function Transactions() {
               </tr>
             </thead>
             <tbody>
-              {allTransactions.data?.map(tx => (
+              {allTransactions.data?.items?.map(tx => (
                 <tr key={tx.transactionId} className="border-b hover:bg-gray-50">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
@@ -179,12 +226,29 @@ export default function Transactions() {
           </table>
         </div>
         <div className="flex justify-between items-center mt-6">
-          <p className="text-sm text-gray-600">Hiển thị {allTransactions.data?.length} của {allTransactions.data?.length} giao dịch</p>
+          <p className="text-sm text-gray-600">
+            Hiển thị {pagination.startItem} - {pagination.endItem} của {pagination.totalCount} giao dịch
+          </p>
           <div className="flex items-center gap-2">
-            <button className="px-3 py-1 border rounded-lg hover:bg-gray-100"><ChevronLeft size={16} /></button>
-            <button className="px-3 py-1 border rounded-lg bg-purple-600 text-white">1</button>
-            <button className="px-3 py-1 border rounded-lg hover:bg-gray-100">2</button>
-            <button className="px-3 py-1 border rounded-lg hover:bg-gray-100"><ChevronRight size={16} /></button>
+            <button onClick={() => gotoPage(pageNumber - 1)} disabled={pageNumber <= 1} className="px-3 py-1 border rounded-lg hover:bg-gray-100 disabled:opacity-50">
+              <ChevronLeft size={16} />
+            </button>
+            {/* render a small page list (you can limit number of page buttons shown) */}
+            {Array.from({ length: pagination.totalPages }).map((_, idx) => {
+              const p = idx + 1;
+              return (
+                <button
+                  key={p}
+                  onClick={() => gotoPage(p)}
+                  className={`px-3 py-1 border rounded-lg ${p === pageNumber ? 'bg-purple-600 text-white' : 'hover:bg-gray-100'}`}
+                >
+                  {p}
+                </button>
+              );
+            })}
+            <button onClick={() => gotoPage(pageNumber + 1)} disabled={pageNumber >= pagination.totalPages} className="px-3 py-1 border rounded-lg hover:bg-gray-100 disabled:opacity-50">
+              <ChevronRight size={16} />
+            </button>
           </div>
         </div>
       </div>
