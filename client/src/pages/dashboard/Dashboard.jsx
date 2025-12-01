@@ -19,6 +19,8 @@ import { useNavigate } from "react-router-dom";
 import { formatToLocalDateString } from "../../utils/format.js";
 import useBudgetsLimit from "../../hook/budgets_limit.js";
 import BudgetOverview from "../budgetOverview/BudgetOverview.jsx";
+import FixedExpenses from "../../component/dashboard/FixedExpenses.jsx";
+import FinancialHealth from "../../component/dashboard/FinancialHealth.jsx";
 const Dashboard = () => {
   // Lấy thông tin từ localstorage
   const userName = localStorage.getItem('userInfo');
@@ -124,7 +126,6 @@ const Dashboard = () => {
               {isProfileOpen && <ProfileDropdown userInfo={userName} onLogout={handleLogOut} />}
             </div>
           </header>
-          <BudgetOverview totalCard={totalCard} changeDate={changeDate} onEditLimit={() => setLimitModalOpen(true)} />
           {/* Stat Cards Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
             <StatCard
@@ -151,6 +152,12 @@ const Dashboard = () => {
               icon={<PieChartIcon size={24} className="text-blue-500" />}
               colorClass="bg-blue-100"
             />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <BudgetOverview totalCard={totalCard} changeDate={changeDate} onEditLimit={() => setLimitModalOpen(true)} />
+            <FixedExpenses />
+            <FinancialHealth income={10000000} expenses={8000000} />
           </div>
 
           {/* Main Grid: Calendar and Charts */}
