@@ -9,6 +9,7 @@ import useTransactions from "../../hook/transactions";
 import { TRANSACTIONS_TYPE } from "../../constants/common";
 import ConfirmationModal from "../../component/modals/ConfirmationModal";
 import TransactionModal from "../dashboard/TransactionModal";
+import { formatCurrency } from "../../utils/format";
 
 // --- ICON MAPPING ---
 // Map danh mục với icon tương ứng
@@ -213,8 +214,8 @@ export default function Transactions() {
                       {tx.transactionType === TRANSACTIONS_TYPE.INCOME ? 'Thu nhập' : 'Chi tiêu'}
                     </span>
                   </td>
-                  <td className={`p-4 font-bold text-right ${tx.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                    {tx.type === 'income' ? '+' : '-'} {(tx.amount)}
+                  <td className={`p-4 font-bold text-right ${tx.transactionType === TRANSACTIONS_TYPE.INCOME ? 'text-green-600' : 'text-red-600'}`}>
+                    {tx.transactionType === TRANSACTIONS_TYPE.INCOME ? '+' : '-'} {formatCurrency(tx.amount)}
                   </td>
                   <td className="p-4 text-center">
                     <button onClick={() => openEditModal(tx)} className="p-2 text-gray-500 hover:text-blue-600"><Edit size={18} /></button>
