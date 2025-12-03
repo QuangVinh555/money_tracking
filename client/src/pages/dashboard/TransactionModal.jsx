@@ -148,7 +148,7 @@ const TransactionModal = ({
                 <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
                   <p className="text-sm text-red-700">Tổng chi</p>
                   <p className="text-lg font-bold text-red-600">
-                    {formatCurrency(totalCard.data?.expense)}
+                    {formatCurrency(totalCard.data?.extraPlanned)}
                   </p>
                 </div>
               </div>

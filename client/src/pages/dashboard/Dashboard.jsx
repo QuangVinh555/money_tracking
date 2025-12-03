@@ -21,6 +21,7 @@ import useBudgetsLimit from "../../hook/budgets_limit.js";
 import BudgetOverview from "../budgetOverview/BudgetOverview.jsx";
 import FixedExpenses from "../../component/dashboard/FixedExpenses.jsx";
 import FinancialHealth from "../../component/dashboard/FinancialHealth.jsx";
+import { FIXED_COST_TYPES } from "../../constants/common.js";
 const Dashboard = () => {
   // Lấy thông tin từ localstorage
   const userName = localStorage.getItem('userInfo');
@@ -43,7 +44,12 @@ const Dashboard = () => {
   const { loadingBudgetsLimit, createBudgetsLimit } = useBudgetsLimit();
 
   // List data transactions call API
-  const { transactions, totalCard, totalCardByDate, createTransactions, loading, fetchTotalCardTransactions, fetchTotalCardByDateTransactions } = useTransactions(changeDate);
+  const {
+    transactions, totalCard, totalCardByDate,
+    createTransactions, loading, fetchTotalCardTransactions,
+    fetchTotalCardByDateTransactions, fixedCostTransactions, getFixedCostTransactions
+  }
+    = useTransactions(changeDate);
 
   // Popup thêm giao dịch
   const [isModalOpen, setModalOpen] = useState(false);
@@ -91,10 +97,18 @@ const Dashboard = () => {
     fetchTotalCardByDateTransactions(formatToLocalDateString(date));
   };
 
+
   // Thêm giao dịch transactions
   const handleAddTransaction = async (newTransaction) => {
     await createTransactions(newTransaction);
     await fetchTotalCardByDateTransactions(newTransaction.transaction_Date);
+    // Tạo Set để kiểm tra nhanh (chuyển object sang Set)
+    const FIXED_COST_TYPE_SET = new Set(Object.values(FIXED_COST_TYPES));
+    // Kiểm tra nếu thêm giao dịch thuộc loại giao dịch cố định thì mới gọi lại API lấy giao dịch cố định
+    const isFixedCostType = FIXED_COST_TYPE_SET.has(newTransaction.categoryId);
+    if (isFixedCostType) {
+      await getFixedCostTransactions();
+    }
   };
 
   // Thêm hạn mức Budgets_limit
@@ -156,7 +170,7 @@ const Dashboard = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <BudgetOverview totalCard={totalCard} changeDate={changeDate} onEditLimit={() => setLimitModalOpen(true)} />
-            <FixedExpenses />
+            <FixedExpenses fixedCostTransactions={fixedCostTransactions} />
             <FinancialHealth income={10000000} expenses={8000000} />
           </div>
 
