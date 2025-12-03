@@ -1,8 +1,8 @@
 import { Zap} from 'lucide-react';
 
-const FinancialHealth = ({ income, expenses }) => {
-    const savings = income - expenses;
-    const savingsRate = income > 0 ? (savings / income) * 100 : 0;
+const FinancialHealth = ({ totalCard }) => {
+    // Tỷ lệ tiết kiệm = (Số dư / Thu nhập) * 100%
+    const savingsRate = totalCard?.data?.income > 0 ? (totalCard?.data?.balance / totalCard?.data?.income) * 100 : 0;
     
     let level = 'Thấp';
     let color = 'text-red-500';

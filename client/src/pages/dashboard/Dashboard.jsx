@@ -171,7 +171,7 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <BudgetOverview totalCard={totalCard} changeDate={changeDate} onEditLimit={() => setLimitModalOpen(true)} />
             <FixedExpenses fixedCostTransactions={fixedCostTransactions} />
-            <FinancialHealth income={10000000} expenses={8000000} />
+            <FinancialHealth totalCard={totalCard} />
           </div>
 
           {/* Main Grid: Calendar and Charts */}
