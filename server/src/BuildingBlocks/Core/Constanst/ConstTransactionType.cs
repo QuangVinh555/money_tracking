@@ -16,5 +16,14 @@ namespace Core.Constanst
         /// Chi tiêu
         /// </summary>
         public const string EXPENSE = "expense";
+
+        /// <summary>
+        /// Thu nhập
+        /// </summary>
+        public const int INCOME_NUMBER = 1; // INCOME
+        /// <summary>
+        /// Chi tiêu
+        /// </summary>
+        public const int EXPENSE_NUMBER = 2; // EXPENSE
     }
 }
