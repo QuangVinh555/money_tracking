@@ -10,6 +10,8 @@ export default function useTransactions(datetime) {
   const [totalCard, setTotalCard] = useState(0);
   // Tính tổng thu nhập theo từng ngày nhất định(khi người dùng click vào ngày bất kì để xem giao dịch)
   const [totalCardByDate, setTotalCardByDate] = useState(0);
+  // Lấy ra các giao dich cố định trong tháng hiện tại
+  const [fixedCostTransactions, setFixedCostTransactions] = useState([]);
   // Loading
   const [loading, setLoading] = useState(false);
 
@@ -93,11 +95,23 @@ export default function useTransactions(datetime) {
     }
   };
 
+  const getFixedCostTransactions = async () => {
+    try {
+      const res = await transactionsApi.getTransactionsFixedCost(datetime); 
+      setFixedCostTransactions(res.data);
+    } catch (err) {   
+      console.error('Lỗi fetch fixed cost transactions:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Render danh sách giao dịch được nhóm theo từng ngày trong tháng
   // Render danh sách tất cả giao dịch
   useEffect(() => {
     fetchTransactions();
     fetchAllTransactions();
+    getFixedCostTransactions();
   }, [datetime]);
 
   // Khi nào transactions không [](có data) thì mới gọi api tính toán
@@ -117,6 +131,8 @@ export default function useTransactions(datetime) {
     fetchTransactions,
     fetchAllTransactions,
     fetchTotalCardTransactions,
-    fetchTotalCardByDateTransactions
+    fetchTotalCardByDateTransactions,
+    getFixedCostTransactions,
+    fixedCostTransactions,
   };
 }

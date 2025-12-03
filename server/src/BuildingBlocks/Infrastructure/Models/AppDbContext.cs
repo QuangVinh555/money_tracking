@@ -77,6 +77,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.Index).HasColumnName("index");
+            entity.Property(e => e.IsFixedCost).HasColumnName("is_fixed_cost");
             entity.Property(e => e.Type).HasColumnName("type");
             entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
         });

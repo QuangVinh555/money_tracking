@@ -27,11 +27,17 @@ namespace Application.Features.Queries.Transaction
         public Task<TransactionsTotalCardResponse> TransactionsTotalCardByDate(DateOnly? OptionDate);
 
         /// <summary>
-        /// Tính tông thu nhập, tổng chi tiêu, hạn mức, số dư theo từng ngày
+        /// Tính tông thu nhập, tổng chi tiêu, theo từng ngày
         /// </summary>
         /// <param name="OptionDate"></param>
         /// <returns></returns>
         public Task<TransactionsTotalCardResponse> TransactionsTotalCardByOptionDate(DateOnly? OptionDate);
+        /// <summary>
+        /// Lấy ra các giao dịch cố định
+        /// </summary>
+        /// <param name="OptionDate"></param>
+        /// <returns></returns>
+        public Task<TransactionFixedCostResponse> TransactionsFixedCost(DateOnly? OptionDate);
 
         /// <summary>
         /// Lấy ra các giao dịch trong tháng nhóm lại theo từng ngày trong tháng
@@ -78,19 +84,29 @@ namespace Application.Features.Queries.Transaction
 
             // Tổng thu nhập
             var totalIncome = await _context.Transactions
-                .Where(t => t.TransactionType == 1 
+                .Where(t => t.TransactionType == ConstTransactionType.INCOME_NUMBER 
                     && t.TransactionDate >= fromDate 
                     && t.TransactionDate <= toDate
                     && t.UserId == userId
                 )
                 .SumAsync(t => t.Amount);
 
-            // Tổng chi tiêu
+            // Tổng chi tiêu (tính luôn giao dịch phát sinh cố định)
             var totalExpense = await _context.Transactions
-                .Where(t => t.TransactionType == 2 
+                .Where(t => t.TransactionType == ConstTransactionType.EXPENSE_NUMBER
                     && t.TransactionDate >= fromDate 
                     && t.TransactionDate <= toDate 
                     && t.UserId == userId
+                )
+                .SumAsync(t => t.Amount);
+
+            // Tổng chi tiêu (không tính giao dịch phát sinh cố định)
+            var totalExtraPlanned = await _context.Transactions
+                .Where(t => t.TransactionType == ConstTransactionType.EXPENSE_NUMBER
+                    && t.TransactionDate >= fromDate
+                    && t.TransactionDate <= toDate
+                    && t.UserId == userId
+                    && t.Category.IsFixedCost != true
                 )
                 .SumAsync(t => t.Amount);
 
@@ -99,13 +115,13 @@ namespace Application.Features.Queries.Transaction
                 .Where(b => b.BudgetsLimitStartDate != null && b.BudgetsLimitStartDate.Value == fromDate && b.UserId == userId)
                 .FirstOrDefaultAsync();
 
-            // --- Chi tiêu trung bình / ngày (loại bỏ category = 6) ---
+            // --- Chi tiêu trung bình / ngày (không tính giao dịch phát sinh cố định)) ---
             var expenseWithoutRent = await _context.Transactions
-                .Where(t => t.TransactionType == 2
+                .Where(t => t.TransactionType == ConstTransactionType.EXPENSE_NUMBER
                     && t.TransactionDate >= fromDate
                     && t.TransactionDate <= toDate
                     && t.UserId == userId
-                    && t.CategoryId != 6 // loại bỏ tiền trọ
+                    && t.Category.IsFixedCost != true
                 )
                 .SumAsync(t => t.Amount);
 
@@ -129,9 +145,15 @@ namespace Application.Features.Queries.Transaction
 
             return new TransactionsTotalCardResponse
             {
+                // Tổng thu nhập
                 Income = totalIncome,
+                // Tổng chi tiêu (kể cả giao dịch phát sinh có dự định)
                 Expense = totalExpense,
+                // Tổng chi tiêu (không tính giao dịch có phát sinh dự định)
+                ExtraPlanned = totalExtraPlanned,
+                // Tổng hạn mức tháng này
                 BudgetLimit = budgetLimit?.BudgetsLimitTotal ?? 0,
+                // Chi tiêu trung bình ngày
                 AverageDailySpending = averageDailySpending
             };
         }
@@ -175,7 +197,7 @@ namespace Application.Features.Queries.Transaction
                     Amount = t.Amount,
                     TransactionDate = t.TransactionDate,
                     TransactionType = t.TransactionType,
-                    TransactionTypeName = t.TransactionType == 1 ? ConstTransactionType.INCOME : ConstTransactionType.EXPENSE,
+                    TransactionTypeName = t.TransactionType == ConstTransactionType.INCOME_NUMBER ? ConstTransactionType.INCOME : ConstTransactionType.EXPENSE,
                     Actived = t.Actived,
                     CreatedAt = t.CreatedAt,
                     UpdateAt = t.UpdatedAt,
@@ -208,7 +230,7 @@ namespace Application.Features.Queries.Transaction
 
             // Tổng thu nhập
             var totalIncome = await _context.Transactions
-                .Where(t => t.TransactionType == 1
+                .Where(t => t.TransactionType == ConstTransactionType.INCOME_NUMBER
                     && t.TransactionDate == OptionDate
                     && t.UserId == userId
                 )
@@ -216,9 +238,18 @@ namespace Application.Features.Queries.Transaction
 
             // Tổng chi tiêu
             var totalExpense = await _context.Transactions
-                .Where(t => t.TransactionType == 2
+                .Where(t => t.TransactionType == ConstTransactionType.EXPENSE_NUMBER
                     && t.TransactionDate == OptionDate
                     && t.UserId == userId
+                )
+                .SumAsync(t => t.Amount);
+
+            // Tổng chi tiêu (không tính giao dịch phát sinh cố định)
+            var totalExtraPlanned = await _context.Transactions
+                .Where(t => t.TransactionType == ConstTransactionType.EXPENSE_NUMBER
+                    && t.TransactionDate == OptionDate
+                    && t.UserId == userId
+                    && t.Category.IsFixedCost != true
                 )
                 .SumAsync(t => t.Amount);
 
@@ -227,6 +258,7 @@ namespace Application.Features.Queries.Transaction
             {
                 Income = totalIncome,
                 Expense = totalExpense,
+                ExtraPlanned = totalExtraPlanned
             };
         }
 
@@ -263,7 +295,7 @@ namespace Application.Features.Queries.Transaction
                    Amount = t.Amount,
                    TransactionDate = t.TransactionDate,
                    TransactionType = t.TransactionType,
-                   TransactionTypeName = t.TransactionType == 1 ? ConstTransactionType.INCOME : ConstTransactionType.EXPENSE,
+                   TransactionTypeName = t.TransactionType == ConstTransactionType.INCOME_NUMBER ? ConstTransactionType.INCOME : ConstTransactionType.EXPENSE,
                    Actived = t.Actived,
                    CreatedAt = t.CreatedAt,
                    UpdateAt = t.UpdatedAt,
@@ -323,12 +355,12 @@ namespace Application.Features.Queries.Transaction
 
             // Tính tổng thu nhập
             var totalIncome = await filteredQuery
-                .Where(t => t.TransactionType == 1)
+                .Where(t => t.TransactionType == ConstTransactionType.INCOME_NUMBER)
                 .SumAsync(t => t.Amount);
 
-            // Tính tổng chi tiêu
+            // Tính tổng chi tiêu (không tính các giao dịch cố định)
             var totalExpense = await filteredQuery
-                .Where(t => t.TransactionType == 2)
+                .Where(t => t.TransactionType == ConstTransactionType.EXPENSE_NUMBER && t.Category.IsFixedCost != true)
                 .SumAsync(t => t.Amount);
 
 
@@ -367,6 +399,45 @@ namespace Application.Features.Queries.Transaction
                 TotalCount = totalCount,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
+            };
+        }
+
+        public async Task<TransactionFixedCostResponse> TransactionsFixedCost(DateOnly? OptionDate)
+        {
+            var userId = _currentUser.UserId;
+            // Lấy ngày hiện tại
+            var now = DateOnly.FromDateTime(DateTime.UtcNow);
+
+            // Khoảng ngày lọc
+            var firstDayOfMonth = OptionDate.HasValue
+                ? DateTimeExtensions.ToStartOfMonth(OptionDate.Value)
+                : DateTimeExtensions.ToStartOfMonth(now);
+
+            var lastDayOfMonth = OptionDate.HasValue
+                ? DateTimeExtensions.ToEndOfMonth(OptionDate.Value)
+                : DateTimeExtensions.ToEndOfMonth(now);
+
+            var fixedCostItems = await _context.Transactions
+                .Where(x =>
+                    x.UserId == userId &&
+                    x.Actived == true &&
+                    x.TransactionDate >= firstDayOfMonth &&
+                    x.TransactionDate <= lastDayOfMonth &&
+                    x.Category.IsFixedCost == true
+                )
+                .GroupBy(x => x.CategoryId)
+                .Select(g => new FixedCostItem
+                {
+                    CategoryId = g.Key,
+                    CategoryName = g.First().Category.CategoryName ?? "",
+                    Total = g.Sum(x => x.Amount) ?? 0
+                })
+                .ToListAsync();
+
+            return new TransactionFixedCostResponse
+            {
+                FixedCostItems = fixedCostItems.OrderBy(x => x.CategoryId).ToList(),
+                TotalAll = fixedCostItems.Sum(x => x.Total)
             };
         }
     }

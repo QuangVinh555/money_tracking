@@ -6,6 +6,7 @@ const transactionsApi = {
   getAllTransactionsByGroupDate: (datetime) => axiosClient.get(`/transactions/get-by-group-date?OptionDate=${datetime}`),
   getTotalCard: (datetime) => axiosClient.get(`/transactions/total-card?OptionDate=${datetime}`),
   getTotalCardByDate: (datetime) => axiosClient.get(`/transactions/total-card-by-date?OptionDate=${datetime}`),
+  getTransactionsFixedCost: (datetime) => axiosClient.get(`/transactions/get-transaction-fixed-cost?OptionDate=${datetime}`),
   getById: (id) => axiosClient.get(`/transactions/${id}`),
   create: (data) => axiosClient.post('/transactions/create', data),
   update: (id, data) => axiosClient.put(`/transactions/update/${id}`, data),

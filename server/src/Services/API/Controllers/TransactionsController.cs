@@ -165,6 +165,25 @@ namespace server.Controllers
         }
 
         /// <summary>
+        /// Lấy ra các giao dịch có loại cố định
+        /// </summary>
+        /// <param name="OptionDate"></param>
+        /// <returns></returns>
+        [HttpGet("get-transaction-fixed-cost")]
+        public async Task<IActionResult> TransactionsFixedCost([FromQuery] DateOnly? OptionDate)
+        {
+            var data = await _transactionQuery.TransactionsFixedCost(OptionDate);
+
+            return Ok(new ApiResponse<TransactionFixedCostResponse>
+            {
+                Success = true,
+                Data = data,
+                Message = "Lấy ra các giao dịch có loại cố định tính thành công."
+
+            });
+        }
+
+        /// <summary>
         /// Tìm kiếm giao dịch
         /// </summary>
         /// <param name="request"></param>

@@ -19,6 +19,9 @@ import { useNavigate } from "react-router-dom";
 import { formatToLocalDateString } from "../../utils/format.js";
 import useBudgetsLimit from "../../hook/budgets_limit.js";
 import BudgetOverview from "../budgetOverview/BudgetOverview.jsx";
+import FixedExpenses from "../../component/dashboard/FixedExpenses.jsx";
+import FinancialHealth from "../../component/dashboard/FinancialHealth.jsx";
+import { FIXED_COST_TYPES } from "../../constants/common.js";
 const Dashboard = () => {
   // Lấy thông tin từ localstorage
   const userName = localStorage.getItem('userInfo');
@@ -41,7 +44,12 @@ const Dashboard = () => {
   const { loadingBudgetsLimit, createBudgetsLimit } = useBudgetsLimit();
 
   // List data transactions call API
-  const { transactions, totalCard, totalCardByDate, createTransactions, loading, fetchTotalCardTransactions, fetchTotalCardByDateTransactions } = useTransactions(changeDate);
+  const {
+    transactions, totalCard, totalCardByDate,
+    createTransactions, loading, fetchTotalCardTransactions,
+    fetchTotalCardByDateTransactions, fixedCostTransactions, getFixedCostTransactions
+  }
+    = useTransactions(changeDate);
 
   // Popup thêm giao dịch
   const [isModalOpen, setModalOpen] = useState(false);
@@ -89,10 +97,18 @@ const Dashboard = () => {
     fetchTotalCardByDateTransactions(formatToLocalDateString(date));
   };
 
+
   // Thêm giao dịch transactions
   const handleAddTransaction = async (newTransaction) => {
     await createTransactions(newTransaction);
     await fetchTotalCardByDateTransactions(newTransaction.transaction_Date);
+    // Tạo Set để kiểm tra nhanh (chuyển object sang Set)
+    const FIXED_COST_TYPE_SET = new Set(Object.values(FIXED_COST_TYPES));
+    // Kiểm tra nếu thêm giao dịch thuộc loại giao dịch cố định thì mới gọi lại API lấy giao dịch cố định
+    const isFixedCostType = FIXED_COST_TYPE_SET.has(newTransaction.categoryId);
+    if (isFixedCostType) {
+      await getFixedCostTransactions();
+    }
   };
 
   // Thêm hạn mức Budgets_limit
@@ -124,7 +140,6 @@ const Dashboard = () => {
               {isProfileOpen && <ProfileDropdown userInfo={userName} onLogout={handleLogOut} />}
             </div>
           </header>
-          <BudgetOverview totalCard={totalCard} changeDate={changeDate} onEditLimit={() => setLimitModalOpen(true)} />
           {/* Stat Cards Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
             <StatCard
@@ -151,6 +166,12 @@ const Dashboard = () => {
               icon={<PieChartIcon size={24} className="text-blue-500" />}
               colorClass="bg-blue-100"
             />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <BudgetOverview totalCard={totalCard} changeDate={changeDate} onEditLimit={() => setLimitModalOpen(true)} />
+            <FixedExpenses fixedCostTransactions={fixedCostTransactions} />
+            <FinancialHealth totalCard={totalCard} />
           </div>
 
           {/* Main Grid: Calendar and Charts */}
