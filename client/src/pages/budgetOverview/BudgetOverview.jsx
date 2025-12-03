@@ -3,26 +3,65 @@ import { Edit, Lightbulb } from 'lucide-react'
 import { formatCurrency } from '../../utils/format';
 
 const BudgetOverview = ({ totalCard, changeDate, onEditLimit }) => {
+    // Tháng trả ra 0 - 11 nên cần +1 để hiển thị đúng tháng hiện tại
     const nowMonth = new Date(changeDate).getMonth() + 1;
-    const expenseProgressRaw = (totalCard.data?.expense / totalCard.data?.budgetLimit) * 100;
+    // Tính toán phần trăm tiến độ chi tiêu = (Đã chi(không tính giao dịch cố định) / Hạn mức) * 100
+    const expenseProgressRaw = (totalCard.data?.extraPlanned / totalCard.data?.budgetLimit) * 100;
     const expenseProgress = isNaN(expenseProgressRaw) ? 0 : expenseProgressRaw;
     let progressGradient = 'from-purple-500 to-blue-500';
     if (expenseProgress > 75) progressGradient = 'from-red-500 to-orange-500';
     else if (expenseProgress > 50) progressGradient = 'from-amber-500 to-yellow-500';
 
-    // Tính toán dự báo
-    const today = new Date();
-    const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-    const currentDay = today.getDate();
-    const remainingDays = daysInMonth - currentDay;
+    // -----------------------------
+    //   Tính toán dự báo đúng logic
+    // -----------------------------
+    const selectedDate  = new Date(changeDate);       // ngày được chọn
+    const now = new Date();                           // ngày hiện tại
 
-    // Gợi ý chi tiêu mỗi ngày cho những ngày còn lại
-    const recommendedDaily = remainingDays > 0 ? Math.max(0, totalCard.data?.remainingLimit / remainingDays) : 0;
+    // Xác định FE đang xem tháng hiện tại hay tháng khác
+    const isCurrentMonth =
+        selectedDate.getFullYear() === now.getFullYear() &&
+        selectedDate.getMonth() === now.getMonth();
 
-    // Dự báo dư/thiếu cuối tháng dựa trên tốc độ hiện tại
-    const dailyAvg = totalCard.data?.expense / currentDay;
-    const projectedTotal = dailyAvg * daysInMonth;
+    // Tổng số ngày của tháng được chọn (ngày cuối cùng của tháng đó)
+    const daysInMonth = new Date(
+        selectedDate.getFullYear(),
+        selectedDate.getMonth() + 1,
+        0
+    ).getDate();
+
+    let currentDay;
+    let remainingDays;
+
+    if (isCurrentMonth) {
+        // Nếu đang xem tháng hiện tại → dùng ngày thật
+        currentDay = now.getDate();
+        remainingDays = daysInMonth - currentDay;
+    } else {
+        // Nếu đang xem tháng cũ hoặc tháng tương lai → không dự báo
+        currentDay = daysInMonth;  // xem như full tháng đã qua
+        remainingDays = 0;
+    }
+
+    // Gợi ý chi tiêu cho những ngày còn lại (chỉ tháng hiện tại)
+    const recommendedDaily =
+        remainingDays > 0
+            ? Math.max(0, totalCard.data?.remainingLimit / remainingDays)
+            : 0;
+
+    // Trung bình chi mỗi ngày
+    const dailyAvg =
+        currentDay > 0
+            ? totalCard.data?.extraPlanned / currentDay
+            : 0;
+
+    // Dự báo chi thêm cho những ngày còn lại
+    const projectedExtra = dailyAvg * remainingDays; // (Những tháng cũ sẽ là 0 do remainingDays = 0)
+    // Dự báo tổng chi tiêu tháng = Đã chi + Dự báo chi thêm
+    const projectedTotal = totalCard.data?.extraPlanned + projectedExtra;
+    // Dự báo dư/thiếu cuối tháng
     const projectedBalance = totalCard.data?.budgetLimit - projectedTotal;
+
 
     return (
         <div className="mb-8 p-6 bg-white rounded-2xl shadow-lg border h-full">
@@ -38,7 +77,7 @@ const BudgetOverview = ({ totalCard, changeDate, onEditLimit }) => {
             </div>
             <div className="mt-4">
                 <div className="flex justify-between text-sm text-gray-600 mb-1">
-                    <span>Đã chi: {formatCurrency(totalCard.data?.expense)}</span>
+                    <span>Đã chi: {formatCurrency(totalCard.data?.extraPlanned)}</span>
                     <span>Hạn mức: {formatCurrency(totalCard.data?.budgetLimit)}</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
