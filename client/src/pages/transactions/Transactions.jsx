@@ -177,11 +177,11 @@ export default function Transactions() {
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="bg-green-100 border border-green-200 p-4 rounded-lg">
             <p className="text-sm text-green-800 font-semibold">Tổng thu nhập (lọc)</p>
-            <p className="text-xl font-bold text-green-700">{allTransactions.data?.items[0]?.income ?? 0}</p>
+            <p className="text-xl font-bold text-green-700">{formatCurrency(allTransactions.data?.items[0]?.income ?? 0)}</p>
           </div>
           <div className="bg-red-100 border border-red-200 p-4 rounded-lg">
             <p className="text-sm text-red-800 font-semibold">Tổng chi tiêu (lọc)</p>
-            <p className="text-xl font-bold text-red-700">{allTransactions.data?.items[0]?.expense ?? 0}</p>
+            <p className="text-xl font-bold text-red-700">{formatCurrency(allTransactions.data?.items[0]?.expense ?? 0)}</p>
           </div>
         </div>
 
