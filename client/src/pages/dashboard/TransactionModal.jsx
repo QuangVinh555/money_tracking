@@ -46,6 +46,8 @@ const TransactionModal = ({
   // State quản lý danh mục giao dịch
   const [category, setCategory] = useState(1); // Mặc định số 1: danh mục ăn uống
   const [description, setDescription] = useState("");
+  // State quản lý ngày giao dịch, mặc định lấy selectedDate
+  const [chosenDate, setChosenDate] = useState(formatToLocalDateString(selectedDate));
 
   // Sync khi transactionToEdit thay đổi
   useEffect(() => {
@@ -54,14 +56,16 @@ const TransactionModal = ({
       setAmount(transactionToEdit.amount);
       setCategory(transactionToEdit.categoryId ?? 1);
       setDescription(transactionToEdit.description || '');
+      setChosenDate(formatToLocalDateString(new Date(transactionToEdit.transactionDate)));
     } else {
       // reset khi thêm mới
       setTxType(TRANSACTIONS_TYPE.EXPENSE);
       setAmount('');
       setCategory(1);
       setDescription('');
+      setChosenDate(formatToLocalDateString(selectedDate));
     }
-  }, [transactionToEdit]);
+  }, [transactionToEdit, selectedDate]);
 
   if (!isOpen) return null;
 
@@ -94,12 +98,8 @@ const TransactionModal = ({
     const newTransaction = {
       categoryId: category,
       amount: parseInt(amount, 10),
-      /* 
-        Nếu gửi không kèm giờ thì nên gửi thằng dạng "YYYY-MM-DD", 
-        Nếu kèm giờ phút giây thì phải convert sang UTC
-        DB đã chỉnh lại kiểu date = "YYYY-MM-DD"
-      */
-      transaction_Date: formatToLocalDateString(selectedDate),
+      // Dùng ngày người dùng chọn từ input
+      transaction_Date: chosenDate,
       transaction_Type: txType,
       description,
     };
@@ -111,6 +111,7 @@ const TransactionModal = ({
     setCategory(1);
     setAmount("");
     setDescription("");
+    setChosenDate(formatToLocalDateString(selectedDate));
   };
 
   return (
@@ -201,6 +202,19 @@ const TransactionModal = ({
                   required
                 />
               </div>
+
+              {/* Date Picker Field */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Ngày giao dịch</label>
+                <input
+                  type="date"
+                  value={chosenDate}
+                  onChange={(e) => setChosenDate(e.target.value)}
+                  className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                  required
+                />
+              </div>
+
               <input
                 type="text"
                 value={description}
