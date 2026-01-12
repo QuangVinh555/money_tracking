@@ -27,6 +27,9 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(Cre
 // Cấu hình Query
 builder.Services.AddScoped<ITransactionQuery, TransactionsQuery>();
 builder.Services.AddScoped<ICategoriesQuery, CategoriesQuery>();
+builder.Services.AddScoped<Application.Features.Groups.Queries.IGroupQuery, Application.Features.Groups.Queries.GroupQuery>();
+builder.Services.AddScoped<Application.Features.Groups.Queries.IGroupTransactionQuery, Application.Features.Groups.Queries.GroupTransactionQuery>();
+builder.Services.AddScoped<Application.Features.Groups.Queries.IUserSearchQuery, Application.Features.Groups.Queries.UserSearchQuery>();
 
 // Cấu hình service get current userId
 builder.Services.AddHttpContextAccessor();

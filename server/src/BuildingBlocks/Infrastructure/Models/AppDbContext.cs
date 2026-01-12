@@ -17,6 +17,10 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Category> Categories { get; set; }
 
+    public virtual DbSet<Group> Groups { get; set; }
+
+    public virtual DbSet<GroupMember> GroupMembers { get; set; }
+
     public virtual DbSet<Transaction> Transactions { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -82,6 +86,69 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
         });
 
+        modelBuilder.Entity<Group>(entity =>
+        {
+            entity.HasKey(e => e.GroupId).HasName("groups_pkey");
+
+            entity.ToTable("groups");
+
+            entity.Property(e => e.GroupId).HasColumnName("group_id");
+            entity.Property(e => e.Actived)
+                .HasDefaultValue(true)
+                .HasColumnName("actived");
+            entity.Property(e => e.BudgetLimit)
+                .HasPrecision(15, 2)
+                .HasDefaultValueSql("0")
+                .HasColumnName("budget_limit");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("created_at");
+            entity.Property(e => e.CreatedByUserId).HasColumnName("created_by_user_id");
+            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
+            entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.GroupName)
+                .HasMaxLength(100)
+                .HasColumnName("group_name");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+
+            entity.HasOne(d => d.CreatedByUser).WithMany(p => p.Groups)
+                .HasForeignKey(d => d.CreatedByUserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_created_by_user_id");
+        });
+
+        modelBuilder.Entity<GroupMember>(entity =>
+        {
+            entity.HasKey(e => e.GroupMemberId).HasName("group_members_pkey");
+
+            entity.ToTable("group_members");
+
+            entity.HasIndex(e => new { e.GroupId, e.UserId }, "unique_group_user").IsUnique();
+
+            entity.Property(e => e.GroupMemberId).HasColumnName("group_member_id");
+            entity.Property(e => e.Actived)
+                .HasDefaultValue(true)
+                .HasColumnName("actived");
+            entity.Property(e => e.GroupId).HasColumnName("group_id");
+            entity.Property(e => e.JoinedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("joined_at");
+            entity.Property(e => e.Role)
+                .HasMaxLength(20)
+                .HasDefaultValueSql("'member'::character varying")
+                .HasColumnName("role");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.Group).WithMany(p => p.GroupMembers)
+                .HasForeignKey(d => d.GroupId)
+                .HasConstraintName("fk_group_member_group_id");
+
+            entity.HasOne(d => d.User).WithMany(p => p.GroupMembers)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_group_member_user_id");
+        });
+
         modelBuilder.Entity<Transaction>(entity =>
         {
             entity.HasKey(e => e.TransactionId).HasName("transactions_pk");
@@ -97,6 +164,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.GroupId).HasColumnName("group_id");
             entity.Property(e => e.TransactionDate).HasColumnName("transaction_date");
             entity.Property(e => e.TransactionType).HasColumnName("transaction_type");
             entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
@@ -106,6 +174,11 @@ public partial class AppDbContext : DbContext
                 .HasForeignKey(d => d.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("fk_category_id");
+
+            entity.HasOne(d => d.Group).WithMany(p => p.Transactions)
+                .HasForeignKey(d => d.GroupId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("fk_group_id");
 
             entity.HasOne(d => d.User).WithMany(p => p.Transactions)
                 .HasForeignKey(d => d.UserId)

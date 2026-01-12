@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Footer from "./Footer";
 import { Menu } from "lucide-react";
+import MoneyBot from "./Moneybot";
 
 const Layout = () => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -29,7 +30,7 @@ const Layout = () => {
           <Outlet />
         </main>
       </div>
-
+      <MoneyBot />
       <Footer />
     </div>
   );
