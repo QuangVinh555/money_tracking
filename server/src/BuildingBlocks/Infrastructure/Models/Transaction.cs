@@ -27,7 +27,11 @@ public partial class Transaction
 
     public string? Description { get; set; }
 
+    public int? GroupId { get; set; }
+
     public virtual Category Category { get; set; } = null!;
+
+    public virtual Group? Group { get; set; }
 
     public virtual User User { get; set; } = null!;
 }

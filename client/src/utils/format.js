@@ -5,6 +5,9 @@ export const formatCurrency = (amount) => {
 };
 
 export const formatDate = (date) => {
+    if (!(date instanceof Date)) {
+        date = new Date(date);
+    }
     return new Intl.DateTimeFormat('vi-VN', {
         weekday: 'long',
         year: 'numeric',
@@ -18,7 +21,7 @@ export const formatDate = (date) => {
  * Ví dụ: "2025-06-04T00:00:00.000Z"
  * Dùng để truyền xuống cho BE
  */
-export const formatToUTCDateString = (date)=> {
+export const formatToUTCDateString = (date) => {
     if (!(date instanceof Date)) {
         date = new Date(date); // Trường hợp truyền vào là chuỗi ISO
     }
@@ -54,7 +57,7 @@ export const formatToLocalDateString = (date) => {
     if (!(date instanceof Date)) {
         date = new Date(date);
     }
-    
+
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0'); // tháng: 0-11
     const day = String(date.getDate()).padStart(2, '0');

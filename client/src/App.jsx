@@ -1,8 +1,8 @@
 import React from 'react';
 import {
-  BrowserRouter,
-  Routes,
-  Route
+    BrowserRouter,
+    Routes,
+    Route
 } from 'react-router-dom';
 import Layout from './component/layout/Layout';
 import Dashboard from './pages/dashboard/Dashboard';
@@ -11,6 +11,8 @@ import Categories from './pages/categories/Categories';
 import Login from './pages/login/Login';
 import GuestRoute from './pages/login/GuestRoute';
 import PrivateRoute from './pages/login/PrivateRoute';
+import Groups from './pages/groups/Groups';
+import GroupDetail from './pages/groups/GroupDetail';
 
 function App() {
     return (
@@ -21,6 +23,8 @@ function App() {
                     <Route index element={<Dashboard />} />
                     <Route path="transactions" element={<Transactions />} />
                     <Route path="categories" element={<Categories />} />
+                    <Route path="groups" element={<Groups />} />
+                    <Route path="groups/:groupId" element={<GroupDetail />} />
                     {/* <Route path="budgets" element={<Budgets />} /> */}
                     {/* <Route path="accounts" element={<Accounts />} />
                     <Route path="goals" element={<Goals />} /> */}

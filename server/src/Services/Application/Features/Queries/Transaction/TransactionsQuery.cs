@@ -88,6 +88,7 @@ namespace Application.Features.Queries.Transaction
                     && t.TransactionDate >= fromDate 
                     && t.TransactionDate <= toDate
                     && t.UserId == userId
+                    && t.GroupId == null
                 )
                 .SumAsync(t => t.Amount);
 
@@ -97,6 +98,7 @@ namespace Application.Features.Queries.Transaction
                     && t.TransactionDate >= fromDate 
                     && t.TransactionDate <= toDate 
                     && t.UserId == userId
+                    && t.GroupId == null
                 )
                 .SumAsync(t => t.Amount);
 
@@ -106,6 +108,7 @@ namespace Application.Features.Queries.Transaction
                     && t.TransactionDate >= fromDate
                     && t.TransactionDate <= toDate
                     && t.UserId == userId
+                    && t.GroupId == null
                     && t.Category.IsFixedCost != true
                 )
                 .SumAsync(t => t.Amount);
@@ -121,6 +124,7 @@ namespace Application.Features.Queries.Transaction
                     && t.TransactionDate >= fromDate
                     && t.TransactionDate <= toDate
                     && t.UserId == userId
+                    && t.GroupId == null
                     && t.Category.IsFixedCost != true
                 )
                 .SumAsync(t => t.Amount);
@@ -182,6 +186,7 @@ namespace Application.Features.Queries.Transaction
                 .Where(t => t.TransactionDate >= firstDayOfMonth 
                     && t.TransactionDate <= firstDayOfNextMonth 
                     && t.UserId == userId
+                    && t.GroupId == null
                     && t.Actived == true
                 )
                 .Include(t => t.User)
@@ -233,6 +238,7 @@ namespace Application.Features.Queries.Transaction
                 .Where(t => t.TransactionType == ConstTransactionType.INCOME_NUMBER
                     && t.TransactionDate == OptionDate
                     && t.UserId == userId
+                    && t.GroupId == null
                 )
                 .SumAsync(t => t.Amount);
 
@@ -241,6 +247,7 @@ namespace Application.Features.Queries.Transaction
                 .Where(t => t.TransactionType == ConstTransactionType.EXPENSE_NUMBER
                     && t.TransactionDate == OptionDate
                     && t.UserId == userId
+                    && t.GroupId == null
                 )
                 .SumAsync(t => t.Amount);
 
@@ -249,6 +256,7 @@ namespace Application.Features.Queries.Transaction
                 .Where(t => t.TransactionType == ConstTransactionType.EXPENSE_NUMBER
                     && t.TransactionDate == OptionDate
                     && t.UserId == userId
+                    && t.GroupId == null
                     && t.Category.IsFixedCost != true
                 )
                 .SumAsync(t => t.Amount);
@@ -280,6 +288,7 @@ namespace Application.Features.Queries.Transaction
                .Where(t => t.TransactionDate >= firstDayOfMonth
                    && t.TransactionDate <= firstDayOfNextMonth
                    && t.UserId == userId
+                   && t.GroupId == null
                    && t.Actived == true
                )
                .Include(t => t.User)
@@ -328,6 +337,7 @@ namespace Application.Features.Queries.Transaction
 
             var query =  _context.Transactions
                 .Where(t => t.UserId == userId) // lọc theo user
+                .Where(t => t.GroupId == null) // chỉ lấy giao dịch cá nhân
                 .Where(t => t.TransactionDate >= fromDate && t.TransactionDate <= toDate)
                 .Where(t=> t.Actived == true)
                 .AsQueryable();
@@ -420,6 +430,7 @@ namespace Application.Features.Queries.Transaction
             var fixedCostItems = await _context.Transactions
                 .Where(x =>
                     x.UserId == userId &&
+                    x.GroupId == null &&
                     x.Actived == true &&
                     x.TransactionDate >= firstDayOfMonth &&
                     x.TransactionDate <= lastDayOfMonth &&

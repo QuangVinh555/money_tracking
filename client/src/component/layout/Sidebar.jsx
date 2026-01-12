@@ -1,12 +1,13 @@
 import React from "react";
-import { DollarSign, LayoutDashboard, Repeat, CreditCard, Wallet, Gem } from "lucide-react";
+import { DollarSign, LayoutDashboard, Repeat, CreditCard, Wallet, Gem, Users } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 const menuItems = [
   { name: "Tổng quan", icon: <LayoutDashboard />, path: "/" },
   { name: "Giao dịch", icon: <Repeat />, path: "/transactions" },
-  { name: "Danh mục", icon: <CreditCard />, path: "/categories" },
-  { name: "Ngân sách", icon: <Wallet />, path: "/budgets" },
+  // { name: "Danh mục", icon: <CreditCard />, path: "/categories" },
+  // { name: "Ngân sách", icon: <Wallet />, path: "/budgets" },
+  { name: "Quỹ nhóm", icon: <Users />, path: "/groups" },
 ];
 
 const Sidebar = ({ isMobileMenuOpen, setMobileMenuOpen }) => {
@@ -49,8 +50,8 @@ const Sidebar = ({ isMobileMenuOpen, setMobileMenuOpen }) => {
                     to={item.path}
                     onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isActive
-                        ? "bg-blue-50 text-blue-600 font-bold"
-                        : "hover:bg-gray-100 text-gray-600"
+                      ? "bg-blue-50 text-blue-600 font-bold"
+                      : "hover:bg-gray-100 text-gray-600"
                       }`}
                   >
                     {React.cloneElement(item.icon, {

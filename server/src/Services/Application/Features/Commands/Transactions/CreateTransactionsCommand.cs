@@ -8,6 +8,7 @@ using Core.Common;
 using Core.Extensions;
 using Infrastructure.Models;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Commands.Transactions
 {
@@ -20,6 +21,7 @@ namespace Application.Features.Commands.Transactions
         // 1: income, 2: expense
         public int Transaction_Type { get; set; }
         public string Description { get; set; } = string.Empty;
+        public int? GroupId { get; set; } // null = personal, not null = group transaction
     }
 
     public class CreateTransactionsCommandHandler : IRequestHandler<CreateTransactionsCommand, ApiResponse<bool>>
@@ -45,6 +47,20 @@ namespace Application.Features.Commands.Transactions
                     });
                 }
 
+                // Nếu có GroupId, kiểm tra user có phải thành viên không
+                if (request.GroupId.HasValue)
+                {
+                    var isMember = await _context.GroupMembers
+                        .AnyAsync(gm => gm.GroupId == request.GroupId.Value
+                            && gm.UserId == _currentUserService.UserId 
+                            && gm.Actived == true, cancellationToken);
+
+                    if (!isMember)
+                    {
+                        return ApiResponse<bool>.FailResponse("Bạn không phải thành viên của nhóm này.", new List<string>());
+                    }
+                }
+
                 // Ép kiểu về UTC(Sủa lại đoạn này không cần convert về UTC nữa vì Db chủ lưu "YYYY-MM-DD") thôi
                 //var transactionDate = DateTimeExtensions.EnsureUtc(request.Transaction_Date);
 
@@ -57,6 +73,7 @@ namespace Application.Features.Commands.Transactions
                     // Đổi sang kiểu Date trong DB nên dùng DateOnly ở BE
                     TransactionDate = request.Transaction_Date, 
                     TransactionType = request.Transaction_Type,
+                    GroupId = request.GroupId, // Thêm GroupId
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
                     Actived = true,

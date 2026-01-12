@@ -21,5 +21,6 @@ namespace Application.Features.DTOs.Transactions
         public bool? Actived { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdateAt { get; set; }
+        public int GroupId { get; set; }
     }
 }
