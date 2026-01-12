@@ -55,6 +55,7 @@ const GroupDetail = () => {
     // Transaction Edit/Delete state
     const [transactionToEdit, setTransactionToEdit] = useState(null);
     const [transactionToDelete, setTransactionToDelete] = useState(null); // Only for Transaction
+    const [permissionError, setPermissionError] = useState(null); // Permission Error Warning
 
     // Member Remove Modal state
     const [showRemoveMemberConfirm, setShowRemoveMemberConfirm] = useState(false);
@@ -199,7 +200,20 @@ const GroupDetail = () => {
                 fetchTransactions();
             }
         } catch (error) {
-            alert("Xóa giao dịch thất bại");
+            console.error("Delete transaction error:", error);
+            setTransactionToDelete(null); // Close confirm modal first
+            /* CHÚ Ý:
+            // Tại vì do BE chưa làm check phân quyền nên check trường hợp xóa giao dịch
+            // không phải của mình thì mặc định là người khác đang xóa, nên sẽ báo lỗi không
+            // có quyền xóa giao dịch của người khác
+            // Check for specific permission error or general error
+            // if (error.response?.status === 403 || error.response?.status === 401) {
+            //     setPermissionError("Bạn không thể xóa giao dịch do người khác tạo.");
+            // } else {
+            //     setPermissionError(error.response?.data?.message || "Đã xảy ra lỗi khi xóa giao dịch.");
+            // }
+            */
+            setPermissionError("Bạn không thể xóa giao dịch do người khác tạo.");
         }
     }
 
@@ -503,9 +517,9 @@ const GroupDetail = () => {
                                                             {tx.description || tx.categoryName}
                                                         </p>
                                                         <div className="flex items-center gap-2 mt-0.5">
-                                                            {/* <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
+                                                            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
                                                                 {tx.categoryName}
-                                                            </span> */}
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -761,6 +775,27 @@ const GroupDetail = () => {
                             <button onClick={() => setShowDeleteConfirm(false)} className="flex-1 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 font-semibold text-gray-600">Hủy</button>
                             <button onClick={handleDeleteGroup} className="flex-1 py-2.5 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 shadow-lg shadow-red-200">Xóa vĩnh viễn</button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Permission/Error Warning Modal */}
+            {permissionError && (
+                <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fade-in backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl w-full max-w-sm p-6 text-center animate-scale-up shadow-2xl border border-gray-100">
+                        <div className="mx-auto w-16 h-16 bg-yellow-50 rounded-full flex items-center justify-center mb-4 ring-8 ring-yellow-50/50">
+                            <AlertTriangle className="text-yellow-500" size={32} />
+                        </div>
+                        <h3 className="text-xl font-bold mb-2 text-gray-900">Không thể xóa</h3>
+                        <p className="text-gray-600 mb-6 px-2 leading-relaxed">
+                            {permissionError}
+                        </p>
+                        <button
+                            onClick={() => setPermissionError(null)}
+                            className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg"
+                        >
+                            Đã hiểu
+                        </button>
                     </div>
                 </div>
             )}
