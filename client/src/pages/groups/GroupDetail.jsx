@@ -3,13 +3,33 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, TrendingDown, Wallet,
     UserPlus, Settings, Trash2, Edit, Search, X, MoreVertical,
-    ChevronLeft, ChevronRight, Calendar
+    ChevronLeft, ChevronRight, AlertTriangle, Shield, Calendar,
+    Utensils, ShoppingCart, Car, Home, DollarSign,
+    Gamepad2, AlertCircle, Briefcase, Building2
 } from 'lucide-react';
 import groupApi from '../../api/modules/groupApi';
 import transactionsApi from '../../api/modules/transactions';
 import TransactionModal from '../dashboard/TransactionModal';
 import SpendingLimitModal from '../dashboard/SpendingLimitModal';
-import { formatCurrency, formatToLocalDateString, formatToLocalDateTimeString } from '../../utils/format';
+import ConfirmationModal from '../../component/modals/ConfirmationModal';
+import { formatCurrency, formatToLocalDateString } from '../../utils/format';
+import { TRANSACTIONS_TYPE } from '../../constants/common';
+
+// --- ICON MAPPING ---
+const categoryIcons = {
+    'Ăn uống': <Utensils size={20} className="text-orange-500" />,
+    'Giải trí': <Gamepad2 size={20} className="text-pink-500" />,
+    'Mua sắm': <ShoppingCart size={20} className="text-blue-500" />,
+    'Lương': <DollarSign size={20} className="text-emerald-500" />,
+    'Di chuyển': <Car size={20} className="text-green-500" />,
+    'Chi phí phát sinh': <AlertCircle size={20} className="text-red-500" />,
+    'Thu nhập thêm': <Briefcase size={20} className="text-indigo-500" />,
+    'Tiền thuê trọ': <Building2 size={20} className="text-yellow-600" />,
+    'Chi phí sinh hoạt': <Home size={20} className="text-purple-500" />,
+    'Default': <DollarSign size={20} className="text-gray-500" />,
+};
+
+const getCategoryIcon = (category) => categoryIcons[category] || categoryIcons['Default'];
 
 const GroupDetail = () => {
     const { groupId } = useParams();
@@ -30,7 +50,15 @@ const GroupDetail = () => {
     const [showLimitModal, setShowLimitModal] = useState(false);
     const [showAddMember, setShowAddMember] = useState(false);
     const [showEditGroup, setShowEditGroup] = useState(false);
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // Only for Group
+
+    // Transaction Edit/Delete state
+    const [transactionToEdit, setTransactionToEdit] = useState(null);
+    const [transactionToDelete, setTransactionToDelete] = useState(null); // Only for Transaction
+
+    // Member Remove Modal state
+    const [showRemoveMemberConfirm, setShowRemoveMemberConfirm] = useState(false);
+    const [memberToRemove, setMemberToRemove] = useState(null);
 
     // Settings Menu state
     const [showSettingsMenu, setShowSettingsMenu] = useState(false);
@@ -146,6 +174,35 @@ const GroupDetail = () => {
         }
     };
 
+    const handleUpdateTransaction = async (id, data) => {
+        try {
+            const res = await transactionsApi.update(id, data);
+            if (res.data.success) {
+                setShowTransactionModal(false);
+                setTransactionToEdit(null);
+                fetchGroupData();
+                fetchTransactions();
+            }
+        } catch (error) {
+            console.error("Lỗi update giao dịch", error);
+            alert("Cập nhật giao dịch thất bại");
+        }
+    };
+
+    const handleDeleteTransaction = async () => {
+        if (!transactionToDelete) return;
+        try {
+            const res = await transactionsApi.delete(transactionToDelete.transactionId);
+            if (res.data.success) {
+                setTransactionToDelete(null);
+                fetchGroupData();
+                fetchTransactions();
+            }
+        } catch (error) {
+            alert("Xóa giao dịch thất bại");
+        }
+    }
+
     const handleUpdateLimit = async (limitData) => {
         try {
             const limit = limitData.Budgets_Limit_Total;
@@ -208,12 +265,19 @@ const GroupDetail = () => {
         }
     };
 
-    const handleRemoveMember = async (userId) => {
-        if (!window.confirm("Bạn chắc chắn muốn xóa thành viên này?")) return;
+    const confirmRemoveMember = (member) => {
+        setMemberToRemove(member);
+        setShowRemoveMemberConfirm(true);
+    }
+
+    const handleRemoveMember = async () => {
+        if (!memberToRemove) return;
         try {
-            const res = await groupApi.removeMember(groupId, userId);
+            const res = await groupApi.removeMember(groupId, memberToRemove.userId);
             if (res.data.success) {
                 fetchGroupData();
+                setShowRemoveMemberConfirm(false);
+                setMemberToRemove(null);
             }
         } catch (error) {
             alert(error.response?.data?.message || "Lỗi xóa thành viên");
@@ -230,34 +294,39 @@ const GroupDetail = () => {
     if (!groupDetail) return null;
 
     const isAdmin = groupDetail.currentUserRole === 'admin';
-    const balance = (dashboard?.income || 0) - (dashboard?.expense || 0);
     const budgetLimit = groupDetail.budgetLimit || 0;
     const currentExpense = dashboard?.expense || 0;
+    // Số dư = Hạn mức - Tổng chi (Theo yêu cầu)
+    const remainingBalance = (budgetLimit) - (currentExpense);
+
     const progressPercent = budgetLimit > 0 ? Math.min((currentExpense / budgetLimit) * 100, 100) : 0;
     const totalPages = Math.ceil(pagination.total / pagination.limit);
 
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
+        <div className="p-6 bg-gray-50 min-h-screen font-sans">
             {/* Header */}
-            <div className="flex justify-between items-start mb-6">
+            <div className="flex justify-between items-start mb-8">
                 <div>
-                    <button onClick={() => navigate('/groups')} className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-2">
+                    <button onClick={() => navigate('/groups')} className="flex items-center gap-2 text-gray-500 hover:text-blue-600 mb-2 transition-colors">
                         <ArrowLeft size={20} /> Quay lại
                     </button>
-                    <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                    <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center gap-3">
                         {groupDetail.groupName}
                         {isAdmin && (
-                            <button onClick={() => setShowEditGroup(true)} className="text-gray-400 hover:text-blue-600 p-1">
-                                <Edit size={18} />
+                            <button onClick={() => setShowEditGroup(true)} className="text-gray-400 hover:text-blue-600 p-1 transition-colors">
+                                <Edit size={20} />
                             </button>
                         )}
                     </h1>
-                    <p className="text-gray-600 mt-1">{groupDetail.description}</p>
+                    <p className="text-gray-600 mt-2 font-medium">{groupDetail.description}</p>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                     {isAdmin && (
-                        <button onClick={() => setShowAddMember(true)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium">
+                        <button
+                            onClick={() => setShowAddMember(true)}
+                            className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2.5 rounded-xl hover:shadow-lg hover:opacity-90 transition-all font-semibold shadow-md"
+                        >
                             <UserPlus size={18} /> <span className="hidden sm:inline">Thêm thành viên</span>
                         </button>
                     )}
@@ -265,17 +334,17 @@ const GroupDetail = () => {
                         <div className="relative settings-menu-container">
                             <button
                                 onClick={() => setShowSettingsMenu(!showSettingsMenu)}
-                                className="p-2 bg-white border rounded-lg hover:bg-gray-100"
+                                className="p-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 shadow-sm transition-colors text-gray-700"
                             >
                                 <MoreVertical size={20} />
                             </button>
                             {showSettingsMenu && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border animate-fade-in">
-                                    <button onClick={() => { setShowEditGroup(true); setShowSettingsMenu(false); }} className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                        <Settings size={16} className="mr-2" /> Cài đặt nhóm
+                                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-2 z-20 border border-gray-100 animate-fade-in divide-y divide-gray-100">
+                                    <button onClick={() => { setShowEditGroup(true); setShowSettingsMenu(false); }} className="flex w-full items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                                        <Settings size={18} className="mr-3 text-gray-400" /> Cài đặt nhóm
                                     </button>
-                                    <button onClick={() => { setShowDeleteConfirm(true); setShowSettingsMenu(false); }} className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                                        <Trash2 size={16} className="mr-2" /> Xóa nhóm
+                                    <button onClick={() => { setShowDeleteConfirm(true); setShowSettingsMenu(false); }} className="flex w-full items-center px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
+                                        <Trash2 size={18} className="mr-3" /> Xóa nhóm
                                     </button>
                                 </div>
                             )}
@@ -284,79 +353,90 @@ const GroupDetail = () => {
                 </div>
             </div>
 
-            {/* Stats Cards - Updated Layout */}
+            {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                {/* Card 1: Budget Level (Replaces Total Income) */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 cursor-pointer hover:shadow-md transition-shadow" onClick={() => isAdmin && setShowLimitModal(true)}>
-                    <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-500 font-medium">Hạn mức chi tiêu</span>
-                        <span className="p-2 bg-indigo-100 text-indigo-600 rounded-lg"><Settings size={20} /></span>
+                {/* Card 1: Budget Limit */}
+                <div
+                    className="group relative bg-gradient-to-br from-blue-500 to-indigo-600 p-6 rounded-2xl shadow-lg text-white cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                    onClick={() => isAdmin && setShowLimitModal(true)}
+                >
+                    <div className="absolute top-0 right-0 p-4 opacity-20">
+                        <Settings size={48} />
                     </div>
-                    {budgetLimit > 0 ? (
-                        <div>
-                            <div className="flex justify-between items-end mb-1">
-                                <p className="text-2xl font-bold text-gray-800">{formatCurrency(budgetLimit)}</p>
-                                <span className={`text-xs font-bold ${progressPercent > 100 ? 'text-red-500' : 'text-gray-500'}`}>
-                                    {progressPercent.toFixed(0)}%
-                                </span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div className={`h-2 rounded-full ${progressPercent > 100 ? 'bg-red-500' : 'bg-blue-600'}`} style={{ width: `${progressPercent}%` }}></div>
-                            </div>
-                            <p className="text-xs text-gray-400 mt-2">
-                                {progressPercent > 100 ? 'Đã vượt quá hạn mức' : `Còn lại ${formatCurrency(budgetLimit - currentExpense)}`}
-                            </p>
+                    <div className="relative z-10">
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="text-blue-100 font-medium text-sm uppercase tracking-wide">Hạn mức chi tiêu</span>
                         </div>
-                    ) : (
-                        <div className="flex flex-col h-full justify-center">
-                            <p className="text-gray-400 text-sm">Chưa thiết lập</p>
-                            <p className="text-blue-500 text-xs mt-1">Bấm để cài đặt</p>
-                        </div>
-                    )}
+                        {budgetLimit > 0 ? (
+                            <div>
+                                <p className="text-3xl font-bold mb-3">{formatCurrency(budgetLimit)}</p>
+                                <div className="w-full bg-black/20 rounded-full h-2 mb-2 backdrop-blur-sm">
+                                    <div className={`h-2 rounded-full ${progressPercent > 100 ? 'bg-red-400' : 'bg-white'}`} style={{ width: `${progressPercent}%` }}></div>
+                                </div>
+                                <p className="text-xs text-blue-100 font-medium">
+                                    {progressPercent > 100 ? '⚠️ Đã vượt quá hạn mức' : `Đã dùng ${progressPercent.toFixed(0)}%`}
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col h-full py-2">
+                                <p className="text-blue-100 text-lg font-medium opacity-80">Chưa thiết lập</p>
+                                <p className="text-white text-xs mt-1 underline decoration-white/50">Bấm để cài đặt</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Card 2: Total Expense */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div className="flex justify-between items-center mb-4">
-                        <span className="text-gray-500 font-medium">Tổng chi</span>
-                        <span className="p-2 bg-red-100 text-red-600 rounded-lg"><TrendingDown size={20} /></span>
+                <div className="relative bg-gradient-to-br from-rose-500 to-red-600 p-6 rounded-2xl shadow-lg text-white hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="absolute top-0 right-0 p-4 opacity-20">
+                        <TrendingDown size={48} />
                     </div>
-                    <p className="text-3xl font-bold text-gray-800">{formatCurrency(dashboard?.expense || 0)}</p>
+                    <div className="relative z-10">
+                        <span className="text-rose-100 font-medium text-sm uppercase tracking-wide">Tổng chi tiêu</span>
+                        <p className="text-3xl font-bold mt-2">{formatCurrency(dashboard?.expense || 0)}</p>
+                        <p className="text-xs text-rose-100 mt-2 font-medium opacity-80">Trong tháng này</p>
+                    </div>
                 </div>
 
                 {/* Card 3: Balance */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div className="flex justify-between items-center mb-4">
-                        <span className="text-gray-500 font-medium">Số dư</span>
-                        <span className="p-2 bg-blue-100 text-blue-600 rounded-lg"><Wallet size={20} /></span>
+                <div className="relative bg-gradient-to-br from-emerald-500 to-teal-600 p-6 rounded-2xl shadow-lg text-white hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="absolute top-0 right-0 p-4 opacity-20">
+                        <Wallet size={48} />
                     </div>
-                    <p className={`text-3xl font-bold ${balance >= 0 ? 'text-blue-600' : 'text-orange-500'}`}>
-                        {formatCurrency(balance)}
-                    </p>
+                    <div className="relative z-10">
+                        <span className="text-emerald-100 font-medium text-sm uppercase tracking-wide">Số dư khả dụng</span>
+                        <p className="text-3xl font-bold mt-2">{formatCurrency(remainingBalance)}</p>
+                        <p className="text-xs text-emerald-100 mt-2 font-medium opacity-80">= Hạn mức - Tổng chi</p>
+                    </div>
                 </div>
             </div>
 
-            {/* Main Content: Members then Transactions */}
+            {/* Main Content */}
             <div className="space-y-8">
-                {/* Members Section - Full Width */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 className="font-bold text-gray-800 mb-4 text-lg">Thành viên ({groupDetail.members.length})</h3>
+                {/* Members Section */}
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 className="font-bold text-gray-800 mb-6 text-xl flex items-center gap-2">
+                        <Shield size={20} className="text-blue-500" /> Thành viên ({groupDetail.members.length})
+                    </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         {groupDetail.members.map(member => (
-                            <div key={member.groupMemberId} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                                <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">
+                            <div key={member.groupMemberId} className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-transparent hover:border-blue-100 hover:bg-white hover:shadow-md transition-all group">
+                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 text-slate-700 flex items-center justify-center font-bold text-lg shadow-inner">
                                     {member.fullName?.charAt(0).toUpperCase() || 'U'}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-gray-800 truncate">{member.fullName}</p>
-                                    <p className="text-xs text-gray-500">{member.role === 'admin' ? 'Quản trị viên' : 'Thành viên'}</p>
+                                    <p className="text-base font-bold text-gray-800 truncate">{member.fullName}</p>
+                                    <p className={`text-xs font-semibold uppercase tracking-wider ${member.role === 'admin' ? 'text-blue-600' : 'text-gray-500'}`}>
+                                        {member.role === 'admin' ? 'Quản trị viên' : 'Thành viên'}
+                                    </p>
                                 </div>
                                 {isAdmin && member.userId !== groupDetail.createdByUserId && (
                                     <button
-                                        onClick={() => handleRemoveMember(member.userId)}
-                                        className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                                        onClick={() => confirmRemoveMember(member)}
+                                        className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                                        title="Xóa thành viên"
                                     >
-                                        <X size={16} />
+                                        <X size={18} />
                                     </button>
                                 )}
                             </div>
@@ -364,67 +444,114 @@ const GroupDetail = () => {
                     </div>
                 </div>
 
-                {/* Transactions Section - Full Width with Pagination */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-                        <div className="flex items-center gap-2">
-                            <h3 className="font-bold text-gray-800 text-lg">Lịch sử giao dịch</h3>
-                            <div className="relative">
+                {/* Transactions Section - Enhaced UI */}
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                    <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+                        <div className="flex items-center gap-4">
+                            <h3 className="font-bold text-gray-800 text-xl flex items-center gap-2">
+                                <Calendar size={20} className="text-blue-500" />
+                                <span className="hidden sm:inline">Lịch sử giao dịch</span>
+                                <span className="inline sm:hidden">Giao dịch</span>
+                            </h3>
+                            <div className="relative group">
                                 <input
-                                    type="date"
-                                    value={selectedDate}
-                                    onChange={(e) => setSelectedDate(e.target.value)}
-                                    className="pl-3 pr-2 py-1 text-sm border rounded-lg text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    type="month"
+                                    value={selectedDate.substring(0, 7)}
+                                    onChange={(e) => setSelectedDate(e.target.value + "-01")}
+                                    className="pl-3 pr-2 py-1.5 text-sm font-medium border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer bg-gray-50 hover:bg-white transition-colors"
                                 />
                             </div>
                         </div>
 
                         <button
-                            onClick={() => {
-                                // Don't change filters here, just open modal
-                                setShowTransactionModal(true);
-                            }}
-                            className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm transition-colors"
+                            onClick={() => { setTransactionToEdit(null); setShowTransactionModal(true); }}
+                            className="w-full sm:w-auto bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-800 shadow-md transition-all flex items-center justify-center gap-2"
                         >
                             + Thêm giao dịch
                         </button>
                     </div>
 
                     {/* Transaction Table */}
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto rounded-xl border border-gray-100">
                         <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="text-sm text-gray-500 border-b">
-                                    <th className="py-3 font-medium">Ngày</th>
-                                    <th className="py-3 font-medium">Nội dung</th>
-                                    <th className="py-3 font-medium">Người tạo</th>
-                                    <th className="py-3 font-medium">Danh mục</th>
-                                    <th className="py-3 font-medium text-right">Số tiền</th>
+                            <thead className="bg-gray-50">
+                                <tr className="text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                                    <th className="px-6 py-4">Ngày</th>
+                                    <th className="px-6 py-4">Giao dịch</th>
+                                    <th className="px-6 py-4">Người tạo</th>
+                                    <th className="px-6 py-4 text-right">Số tiền</th>
+                                    <th className="px-6 py-4 text-center">Hành động</th>
                                 </tr>
                             </thead>
-                            <tbody className="text-sm">
+                            <tbody className="text-sm divide-y divide-gray-50">
                                 {transactions.length > 0 ? (
                                     transactions.map(tx => (
-                                        <tr key={tx.transactionId} className="border-b last:border-0 hover:bg-gray-50">
-                                            <td className="py-3 text-gray-600 whitespace-nowrap">{tx.transactionDate}</td>
-                                            <td className="py-3 font-medium text-gray-900">{tx.description || tx.categoryName}</td>
-                                            <td className="py-3 text-gray-600">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-600">
-                                                        {tx.fullName?.charAt(0).toUpperCase()}
+                                        <tr key={tx.transactionId} className="hover:bg-blue-50/30 transition-colors">
+                                            {/* Date */}
+                                            <td className="px-6 py-4 text-gray-600 font-medium whitespace-nowrap">
+                                                {formatToLocalDateString(tx.transactionDate)}
+                                            </td>
+
+                                            {/* Main Info: Icon + Description */}
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-gray-100 rounded-full flex-shrink-0">
+                                                        {getCategoryIcon(tx.categoryName)}
                                                     </div>
-                                                    {tx.fullName}
+                                                    <div className="min-w-0">
+                                                        <p className="font-bold text-gray-900 truncate">
+                                                            {tx.description || tx.categoryName}
+                                                        </p>
+                                                        <div className="flex items-center gap-2 mt-0.5">
+                                                            {/* <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
+                                                                {tx.categoryName}
+                                                            </span> */}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </td>
-                                            <td className="py-3 text-gray-600">{tx.categoryName}</td>
-                                            <td className={`py-3 text-right font-bold ${tx.transactionType === 1 ? 'text-green-600' : 'text-red-600'}`}>
+
+                                            {/* Creator */}
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-600">
+                                                        {tx.fullName?.charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <span className="text-gray-700">{tx.fullName}</span>
+                                                </div>
+                                            </td>
+
+                                            {/* Amount */}
+                                            <td className={`px-6 py-4 text-right font-bold text-base ${tx.transactionType === 1 ? 'text-green-600' : 'text-red-600'}`}>
                                                 {tx.transactionType === 1 ? '+' : '-'}{formatCurrency(tx.amount)}
+                                            </td>
+
+                                            {/* Actions */}
+                                            <td className="px-6 py-4 text-center">
+                                                <div className="flex items-center justify-center gap-1">
+                                                    <button
+                                                        onClick={() => { setTransactionToEdit(tx); setShowTransactionModal(true); }}
+                                                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                        title="Sửa"
+                                                    >
+                                                        <Edit size={18} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setTransactionToDelete(tx)}
+                                                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                        title="Xóa"
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="5" className="py-8 text-center text-gray-400">Không có giao dịch nào trong khoảng thời gian này</td>
+                                        <td colSpan="5" className="px-6 py-12 text-center text-gray-400 font-medium bg-gray-50/50">
+                                            Không có giao dịch nào trong tháng này
+                                        </td>
                                     </tr>
                                 )}
                             </tbody>
@@ -433,21 +560,21 @@ const GroupDetail = () => {
 
                     {/* Pagination */}
                     {totalPages > 1 && (
-                        <div className="flex justify-center items-center gap-4 mt-6">
+                        <div className="flex justify-center items-center gap-4 mt-8">
                             <button
                                 onClick={() => handlePageChange(pagination.page - 1)}
                                 disabled={pagination.page === 1}
-                                className="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="p-2.5 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-gray-600"
                             >
                                 <ChevronLeft size={20} />
                             </button>
-                            <span className="text-sm font-medium text-gray-600">
-                                Trang {pagination.page} / {totalPages}
+                            <span className="text-sm font-semibold text-gray-700 bg-gray-100 px-4 py-2 rounded-lg">
+                                Trang <span className="text-blue-600">{pagination.page}</span> / {totalPages}
                             </span>
                             <button
                                 onClick={() => handlePageChange(pagination.page + 1)}
                                 disabled={pagination.page >= totalPages}
-                                className="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="p-2.5 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-gray-600"
                             >
                                 <ChevronRight size={20} />
                             </button>
@@ -458,16 +585,20 @@ const GroupDetail = () => {
 
             {/* --- Modals --- */}
 
+            {/* Transaction Edit/Create Modal */}
             <TransactionModal
                 isOpen={showTransactionModal}
-                onClose={() => setShowTransactionModal(false)}
-                selectedDate={new Date(selectedDate)} // Must be Date object
-                transactions={null} // Don't show existing transactions list in strict mode to avoid complex structure
+                onClose={() => { setShowTransactionModal(false); setTransactionToEdit(null); }}
+                selectedDate={transactionToEdit ? new Date(transactionToEdit.transactionDate) : new Date(selectedDate)}
+                transactions={null}
                 totalCard={{ data: dashboard }}
-                onAddTransaction={handleCreateTransaction}
+                onAddTransaction={handleCreateTransaction} // for Create
+                onUpdateTransaction={handleUpdateTransaction} // for Edit
+                transactionToEdit={transactionToEdit} // Pass the tx to edit
                 isLoading={false}
             />
 
+            {/* Spending Limit Modal */}
             <SpendingLimitModal
                 isOpen={showLimitModal}
                 onClose={() => setShowLimitModal(false)}
@@ -475,54 +606,76 @@ const GroupDetail = () => {
                 onSetLimit={handleUpdateLimit}
             />
 
+            {/* Transaction Delete Confirm */}
+            <ConfirmationModal
+                isOpen={!!transactionToDelete}
+                onClose={() => setTransactionToDelete(null)}
+                onConfirm={handleDeleteTransaction}
+                title="Xác nhận xóa giao dịch"
+                loading={loading}
+            >
+                <p className="text-gray-600">
+                    Bạn có chắc chắn muốn xóa giao dịch <span className="font-bold">{transactionToDelete?.description}</span> không?
+                </p>
+            </ConfirmationModal>
+
+            {/* Add Member Modal */}
             {showAddMember && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fade-in">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 animate-scale-up">
-                        <div className="flex justify-between items-center mb-4">
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fade-in backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 animate-scale-up border border-gray-100">
+                        <div className="flex justify-between items-center mb-6">
                             <h3 className="text-xl font-bold text-gray-800">Thêm thành viên</h3>
-                            <button onClick={() => setShowAddMember(false)} className="p-2 hover:bg-gray-100 rounded-full"><X size={20} /></button>
+                            <button onClick={() => setShowAddMember(false)} className="p-2 hover:bg-gray-100 rounded-full text-gray-500 transition-colors"><X size={20} /></button>
                         </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Tìm kiếm bằng email</label>
+                        <div className="mb-6">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">Tìm kiếm bằng email</label>
                             <div className="relative">
                                 <Search className="absolute left-3 top-3 text-gray-400" size={18} />
                                 <input
                                     type="text"
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                                    placeholder="nhập email..."
+                                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder-gray-400"
+                                    placeholder="Nhập email người dùng..."
                                     value={searchEmail}
                                     onChange={(e) => handleSearchUsers(e.target.value)}
                                     autoFocus
                                 />
                             </div>
                         </div>
-                        <div className="max-h-60 overflow-y-auto mb-6 border rounded-lg divide-y bg-gray-50 min-h-[100px]">
+                        <div className="max-h-60 overflow-y-auto mb-6 border border-gray-100 rounded-xl divide-y divide-gray-50 bg-gray-50/50 min-h-[120px]">
                             {searching ? (
-                                <div className="p-4 text-center text-gray-400">Đang tìm...</div>
+                                <div className="h-full flex flex-col items-center justify-center py-8 text-gray-400 gap-2">
+                                    <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                                    <span className="text-sm">Đang tìm kiếm...</span>
+                                </div>
                             ) : searchResults.length > 0 ? (
                                 searchResults.map(user => (
                                     <div
                                         key={user.userId}
                                         onClick={() => setSelectedUserToAdd(user)}
-                                        className={`p-3 flex items-center justify-between cursor-pointer hover:bg-white transition-colors ${selectedUserToAdd?.userId === user.userId ? 'bg-blue-50 border-l-4 border-blue-500' : ''}`}
+                                        className={`p-3 flex items-center justify-between cursor-pointer hover:bg-white transition-all ${selectedUserToAdd?.userId === user.userId ? 'bg-blue-50 ring-1 ring-blue-500' : ''}`}
                                     >
-                                        <div>
-                                            <p className="font-medium text-gray-800">{user.fullName}</p>
-                                            <p className="text-xs text-gray-500">{user.email}</p>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">
+                                                {user.fullName?.charAt(0).toUpperCase()}
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <p className="font-semibold text-gray-800 text-sm">{user.fullName}</p>
+                                                <p className="text-xs text-gray-500">{user.email}</p>
+                                            </div>
                                         </div>
-                                        {selectedUserToAdd?.userId === user.userId && <span className="text-blue-600 text-xs font-bold bg-blue-100 px-2 py-1 rounded-full">Đã chọn</span>}
+                                        {selectedUserToAdd?.userId === user.userId && <span className="text-blue-600 text-xs font-bold bg-blue-100 px-2 py-1 rounded-md">Đã chọn</span>}
                                     </div>
                                 ))
                             ) : (
-                                searchEmail.length > 2 && <div className="p-4 text-center text-gray-400">Không tìm thấy user nào</div>
+                                searchEmail.length > 2 && <div className="py-8 text-center text-gray-400 text-sm">Không tìm thấy user nào</div>
                             )}
                         </div>
                         <div className="flex gap-3">
-                            <button onClick={() => setShowAddMember(false)} className="flex-1 py-2 border rounded-lg hover:bg-gray-50 font-medium">Hủy</button>
+                            <button onClick={() => setShowAddMember(false)} className="flex-1 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 font-semibold text-gray-600 transition-colors">Hủy</button>
                             <button
                                 onClick={handleAddMember}
                                 disabled={!selectedUserToAdd}
-                                className="flex-1 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                                className="flex-1 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold hover:shadow-lg disabled:opacity-50 disabled:shadow-none transition-all"
                             >
                                 Thêm vào nhóm
                             </button>
@@ -531,40 +684,82 @@ const GroupDetail = () => {
                 </div>
             )}
 
+            {/* Remove Member Confirmation Modal */}
+            {showRemoveMemberConfirm && memberToRemove && (
+                <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fade-in backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl w-full max-w-sm p-6 text-center animate-scale-up shadow-2xl">
+                        <div className="mx-auto w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4 ring-8 ring-red-50/50">
+                            <AlertTriangle className="text-red-500" size={32} />
+                        </div>
+                        <h3 className="text-xl font-bold mb-2 text-gray-900">Xóa thành viên?</h3>
+                        <p className="text-gray-500 mb-6 px-4">
+                            Bạn có chắc chắn muốn xóa <span className="font-bold text-gray-800">{memberToRemove.fullName}</span> khỏi nhóm này không?
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => { setShowRemoveMemberConfirm(false); setMemberToRemove(null); }}
+                                className="flex-1 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 font-semibold text-gray-600 transition-colors"
+                            >
+                                Hủy bỏ
+                            </button>
+                            <button
+                                onClick={handleRemoveMember}
+                                className="flex-1 py-2.5 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition-colors shadow-lg shadow-red-200"
+                            >
+                                Đồng ý xóa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Group Modal */}
             {showEditGroup && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fade-in">
-                    <div className="bg-white rounded-xl w-full max-w-md p-6 animate-scale-up">
-                        <div className="flex justify-between items-center mb-4">
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fade-in backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl w-full max-w-md p-6 animate-scale-up shadow-2xl">
+                        <div className="flex justify-between items-center mb-6">
                             <h3 className="text-xl font-bold text-gray-800">Cài đặt nhóm</h3>
-                            <button onClick={() => setShowEditGroup(false)} className="p-2 hover:bg-gray-100 rounded-full"><X size={20} /></button>
+                            <button onClick={() => setShowEditGroup(false)} className="p-2 hover:bg-gray-100 rounded-full text-gray-500"><X size={20} /></button>
                         </div>
                         <form onSubmit={handleUpdateGroup}>
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Tên nhóm</label>
-                                <input type="text" required className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" value={editForm.groupName} onChange={(e) => setEditForm({ ...editForm, groupName: e.target.value })} />
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Tên nhóm</label>
+                                <input
+                                    type="text"
+                                    required
+                                    className="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                    value={editForm.groupName}
+                                    onChange={(e) => setEditForm({ ...editForm, groupName: e.target.value })}
+                                />
                             </div>
                             <div className="mb-6">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
-                                <textarea className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" rows="3" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}></textarea>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Mô tả</label>
+                                <textarea
+                                    className="w-full p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                    rows="3"
+                                    value={editForm.description}
+                                    onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                                ></textarea>
                             </div>
                             <div className="flex gap-3">
-                                <button type="button" onClick={() => setShowEditGroup(false)} className="flex-1 py-2 border rounded-lg hover:bg-gray-50 font-medium">Hủy</button>
-                                <button type="submit" className="flex-1 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700">Lưu thay đổi</button>
+                                <button type="button" onClick={() => setShowEditGroup(false)} className="flex-1 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 font-semibold text-gray-600">Hủy</button>
+                                <button type="submit" className="flex-1 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-md">Lưu thay đổi</button>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
 
-            {showDeleteConfirm && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fade-in">
-                    <div className="bg-white rounded-xl w-full max-w-sm p-6 text-center animate-scale-up">
-                        <div className="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4"><Trash2 className="text-red-600" /></div>
-                        <h3 className="text-lg font-bold mb-2 text-gray-900">Xóa nhóm này?</h3>
-                        <p className="text-gray-500 mb-6">Hành động này không thể hoàn tác.</p>
+            {/* Delete Group Confirm */}
+            {showDeleteConfirm && !transactionToDelete && (
+                <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fade-in backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl w-full max-w-sm p-6 text-center animate-scale-up shadow-2xl">
+                        <div className="mx-auto w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4 ring-8 ring-red-50/50"><Trash2 className="text-red-600" size={32} /></div>
+                        <h3 className="text-xl font-bold mb-2 text-gray-900">Xóa nhóm này?</h3>
+                        <p className="text-gray-500 mb-6">Hành động này không thể hoàn tác. Tất cả dữ liệu sẽ bị mất vĩnh viễn.</p>
                         <div className="flex gap-3">
-                            <button onClick={() => setShowDeleteConfirm(false)} className="flex-1 py-2 border rounded-lg hover:bg-gray-50 font-medium">Hủy</button>
-                            <button onClick={handleDeleteGroup} className="flex-1 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700">Xóa vĩnh viễn</button>
+                            <button onClick={() => setShowDeleteConfirm(false)} className="flex-1 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 font-semibold text-gray-600">Hủy</button>
+                            <button onClick={handleDeleteGroup} className="flex-1 py-2.5 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 shadow-lg shadow-red-200">Xóa vĩnh viễn</button>
                         </div>
                     </div>
                 </div>

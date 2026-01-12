@@ -5,8 +5,8 @@ import { Link, useLocation } from "react-router-dom";
 const menuItems = [
   { name: "Tổng quan", icon: <LayoutDashboard />, path: "/" },
   { name: "Giao dịch", icon: <Repeat />, path: "/transactions" },
-  { name: "Danh mục", icon: <CreditCard />, path: "/categories" },
-  { name: "Ngân sách", icon: <Wallet />, path: "/budgets" },
+  // { name: "Danh mục", icon: <CreditCard />, path: "/categories" },
+  // { name: "Ngân sách", icon: <Wallet />, path: "/budgets" },
   { name: "Quỹ nhóm", icon: <Users />, path: "/groups" },
 ];
 

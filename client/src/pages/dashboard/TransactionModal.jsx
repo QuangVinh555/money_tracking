@@ -123,7 +123,7 @@ const TransactionModal = ({
               Giao dịch trong ngày
             </h2>
             <p className="text-gray-600 font-semibold">
-              {transactionToEdit ? selectedDate : formatDate(selectedDate)}
+              {formatDate(selectedDate)}
             </p>
           </div>
           <button
