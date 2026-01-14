@@ -11,8 +11,8 @@ services:
 
   backend:
     build:
-      context: ./        # 👈 context phải là thư mục gốc
-      dockerfile: server/Dockerfile  # 👈 trỏ đến đúng Dockerfile
+      context: ./server        # 👈 context phải là thư mục gốc
+      dockerfile: Dockerfile  # 👈 trỏ đến đúng Dockerfile
     ports:
       - "5290:80"  # Ánh xạ cổng 5290 (theo launchSettings.json) tới cổng 80 trong container
     environment:
