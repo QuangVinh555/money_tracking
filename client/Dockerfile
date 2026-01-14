@@ -7,6 +7,11 @@ COPY package.json package-lock.json ./
 RUN npm install
 
 COPY . .
+
+# Set environment variables for Vite build
+ENV VITE_BASE_API=https://money-tracking-backend-cgoe.onrender.com
+ENV VITE_CLIENT_ID=244191614923-f068pao61n37bmq358f5o9p9kr5l18t5.apps.googleusercontent.com
+
 RUN npm run build
 
 # Step 2: Serve with nginx
