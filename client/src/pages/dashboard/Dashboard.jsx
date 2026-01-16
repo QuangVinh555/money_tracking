@@ -183,7 +183,7 @@ const Dashboard = () => {
                 onDayClick={handleDayClick}
               />
             </div>
-            <div className="space-y-6">
+            <div>
               <RecentTransactions transactions={transactions} />
               {/* <ExpensePieChart data={expenseByCategory} /> */}
             </div>
