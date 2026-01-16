@@ -50,18 +50,19 @@ const CalendarView = ({ transactions, onChangeDate, onDayClick }) => {
     const dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
 
     return (
-        <div className="bg-white p-6 rounded-2xl shadow-md">
+        <div className="bg-gradient-to-br from-white to-emerald-50 p-6 rounded-2xl shadow-lg border border-emerald-100">
             <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-bold text-gray-800">{`Tháng ${currentDate.getMonth() + 1}, ${currentDate.getFullYear()}`}</h3>
                 <div className="flex items-center gap-2">
-                    <button onClick={() => changeMonth(-1)} className="p-2 rounded-full hover:bg-gray-100 transition-colors"><ChevronLeft size={20} /></button>
-                    <button onClick={() => changeMonth(1)} className="p-2 rounded-full hover:bg-gray-100 transition-colors"><ChevronRight size={20} /></button>
+                    <button onClick={() => changeMonth(-1)} className="p-2 rounded-full hover:bg-emerald-200 transition-colors text-emerald-600"><ChevronLeft size={20} /></button>
+                    <button onClick={() => changeMonth(1)} className="p-2 rounded-full hover:bg-emerald-200 transition-colors text-emerald-600"><ChevronRight size={20} /></button>
                 </div>
             </div>
             <div className="grid grid-cols-7 gap-1 text-center text-sm font-semibold text-gray-500">
                 {dayNames.map(d => <div key={d} className="py-2">{d}</div>)}
             </div>
-            <div className="grid grid-cols-7 gap-2 mt-2">
+            <div className="bg-gradient-to-b from-white to-emerald-50 rounded-xl p-3">
+                <div className="grid grid-cols-7 gap-2 mt-2">
                 {days.map((day, i) => {
                     /* 
                         Đưa từng ngày về kiểu ngày local của hệ thống vì datetime của api 
@@ -76,7 +77,7 @@ const CalendarView = ({ transactions, onChangeDate, onDayClick }) => {
                     const isCurrentMonth = day.getMonth() === currentDate.getMonth();
 
                     return (
-                        <div key={i} onClick={() => onDayClick(day)} className={`p-2 rounded-lg h-24 flex flex-col ${isCurrentMonth ? 'bg-white hover:bg-blue-50 cursor-pointer' : 'bg-gray-50/70'} border transition-colors`}>
+                        <div key={i} onClick={() => onDayClick(day)} className={`p-2 rounded-lg h-24 flex flex-col transition-all duration-200 ${isCurrentMonth ? 'bg-gradient-to-br from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100 hover:shadow-md cursor-pointer border-emerald-200' : 'bg-gray-50/70 border-gray-200'} border`}>
                             <span className={`font-bold self-start ${isCurrentMonth ? 'text-gray-700' : 'text-gray-400'}`}>{day.getDate()}</span>
                             {dailyTransactions.length > 0 && (
                                 <div className="mt-1 space-y-1 overflow-y-auto text-xs scrollbar-hide">
@@ -88,6 +89,7 @@ const CalendarView = ({ transactions, onChangeDate, onDayClick }) => {
                         </div>
                     );
                 })}
+            </div>
             </div>
         </div>
     );

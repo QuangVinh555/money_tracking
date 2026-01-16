@@ -67,24 +67,24 @@ const Groups = () => {
     if (loading) {
         return (
             <div className="flex items-center justify-center h-screen bg-gray-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
             </div>
         );
     }
 
     return (
-        <div className="p-6 min-h-screen bg-gray-50 font-sans">
+        <div className="p-6 min-h-screen bg-gradient-to-br from-gray-50 to-emerald-50 font-sans">
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                 <div>
-                    <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
+                    <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">
                         Quỹ Nhóm
                     </h1>
                     <p className="text-gray-500 mt-2 font-medium">Quản lý ngân sách chung cho các kế hoạch của bạn</p>
                 </div>
                 <button
                     onClick={() => setShowCreateDialog(true)}
-                    className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl hover:shadow-lg hover:opacity-95 transition-all font-bold shadow-md transform hover:-translate-y-0.5"
+                    className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-6 py-3 rounded-xl hover:shadow-lg hover:opacity-95 transition-all font-bold shadow-md transform hover:-translate-y-0.5"
                 >
                     <Plus size={20} />
                     Tạo nhóm mới
@@ -94,14 +94,14 @@ const Groups = () => {
             {/* Groups List */}
             {groups.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-24 bg-white rounded-3xl shadow-sm border border-gray-100 text-center">
-                    <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-6">
-                        <Users size={48} className="text-blue-500" />
+                    <div className="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center mb-6">
+                        <Users size={48} className="text-emerald-500" />
                     </div>
                     <h3 className="text-2xl font-bold text-gray-800 mb-2">Chưa có quỹ nhóm nào</h3>
                     <p className="text-gray-500 mb-8 max-w-md">Hãy tạo nhóm đầu tiên để bắt đầu quản lý chi tiêu chung cùng bạn bè và người thân.</p>
                     <button
                         onClick={() => setShowCreateDialog(true)}
-                        className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200"
+                        className="bg-emerald-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-200"
                     >
                         Bắt đầu ngay
                     </button>
@@ -111,7 +111,7 @@ const Groups = () => {
                     {sortedMonthKeys.map(month => (
                         <div key={month} className="animate-fade-in-up">
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
+                                <div className="p-2 bg-emerald-100 rounded-lg text-emerald-600">
                                     <Calendar size={20} />
                                 </div>
                                 <h2 className="text-xl font-bold text-gray-800 uppercase tracking-wide">{month}</h2>
@@ -125,15 +125,15 @@ const Groups = () => {
                                         onClick={() => navigate(`/groups/${group.groupId}`)}
                                         className="group bg-white rounded-2xl p-6 hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100 relative overflow-hidden transform hover:-translate-y-1"
                                     >
-                                        <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
+                                        <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-emerald-500 to-teal-600"></div>
 
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-indigo-50 rounded-2xl flex items-center justify-center text-blue-600 shadow-inner group-hover:scale-110 transition-transform">
+                                                <div className="w-14 h-14 bg-gradient-to-br from-emerald-100 to-teal-50 rounded-2xl flex items-center justify-center text-emerald-600 shadow-inner group-hover:scale-110 transition-transform">
                                                     <Users size={28} />
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-bold text-xl text-gray-800 group-hover:text-blue-600 transition-colors">{group.groupName}</h3>
+                                                    <h3 className="font-bold text-xl text-gray-800 group-hover:text-emerald-600 transition-colors">{group.groupName}</h3>
                                                     <p className="text-sm font-medium text-gray-400">{group.memberCount} thành viên</p>
                                                 </div>
                                             </div>
@@ -150,7 +150,7 @@ const Groups = () => {
                                                 <span className="text-xs font-semibold text-gray-400 uppercase">Admin</span>
                                                 <span className="text-sm font-medium text-gray-700">{group.createdByUserName}</span>
                                             </div>
-                                            <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                            <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
                                                 <ArrowRight size={16} />
                                             </div>
                                         </div>
@@ -167,7 +167,7 @@ const Groups = () => {
                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm animate-fade-in p-4">
                     <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl animate-scale-up">
                         <div className="text-center mb-6">
-                            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3 text-blue-600">
+                            <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-3 text-emerald-600">
                                 <Plus size={32} />
                             </div>
                             <h2 className="text-2xl font-bold text-gray-800">Tạo nhóm quỹ mới</h2>
@@ -183,7 +183,7 @@ const Groups = () => {
                                     type="text"
                                     value={newGroup.groupName}
                                     onChange={(e) => setNewGroup({ ...newGroup, groupName: e.target.value })}
-                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-gray-50 hover:bg-white"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all bg-gray-50 hover:bg-white"
                                     placeholder="Ví dụ: Du lịch Đà Nẵng 2026"
                                     required
                                     autoFocus
@@ -196,7 +196,7 @@ const Groups = () => {
                                 <textarea
                                     value={newGroup.description}
                                     onChange={(e) => setNewGroup({ ...newGroup, description: e.target.value })}
-                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-gray-50 hover:bg-white"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all bg-gray-50 hover:bg-white"
                                     placeholder="Mô tả mục đích của nhóm..."
                                     rows="3"
                                 />
@@ -214,7 +214,7 @@ const Groups = () => {
                                 </button>
                                 <button
                                     type="submit"
-                                    className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold hover:shadow-lg hover:opacity-95 transition-all shadow-md"
+                                    className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-bold hover:shadow-lg hover:opacity-95 transition-all shadow-md"
                                 >
                                     Tạo nhóm
                                 </button>

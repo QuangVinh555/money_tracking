@@ -30,24 +30,24 @@ const RecentTransactions = ({ transactions }) => {
         ?.slice(0, 10);
 
     return (
-        <div className="bg-white p-6 rounded-2xl shadow-md h-full">
+        <div className="bg-gradient-to-br from-white to-emerald-50 p-6 rounded-2xl shadow-lg border border-emerald-100 h-full">
             <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-bold text-gray-800">Giao dịch gần đây</h3>
-                <button className="text-sm text-blue-600 font-semibold flex items-center gap-1">
+                <button className="text-sm text-emerald-600 font-semibold flex items-center gap-1 hover:text-teal-600 transition-colors">
                     Xem tất cả <ArrowRight size={14} />
                 </button>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-2">
                 {allTransactions?.map((tx, i) => (
-                    <div key={i} className="flex items-center">
-                        <div className="p-3 bg-gray-100 rounded-full mr-4">
+                    <div key={i} className="flex items-center p-3 rounded-lg hover:shadow-md transition-all">
+                        <div className="p-3 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full mr-4 text-emerald-600 flex-shrink-0">
                             {getCategoryIcon(tx.categoryName)}
                         </div>
-                        <div className="flex-grow">
-                            <p className="font-semibold text-gray-800">{tx.description}</p>
+                        <div className="flex-grow min-w-0">
+                            <p className="font-semibold text-gray-800 truncate">{tx.description}</p>
                             <p className="text-sm text-gray-500">{tx.transactionDate}</p>
                         </div>
-                        <p className={`font-bold ${tx.transactionType === TRANSACTIONS_TYPE.INCOME ? 'text-green-500' : 'text-red-500'}`}>
+                        <p className={`font-bold flex-shrink-0 ${tx.transactionType === TRANSACTIONS_TYPE.INCOME ? 'text-green-500' : 'text-red-500'}`}>
                             {tx.transactionType === TRANSACTIONS_TYPE.INCOME ? '+' : '-'} {formatCurrency(tx.amount)}
                         </p>
                     </div>

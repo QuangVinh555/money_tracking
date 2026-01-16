@@ -119,7 +119,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen text-gray-800 font-sans">
+    <div className="bg-gradient-to-br from-gray-50 to-emerald-50 min-h-screen text-gray-800 font-sans">
       <div className="flex">
         {/* Sidebar */}
         {/* <Sidebar /> */}
@@ -132,9 +132,9 @@ const Dashboard = () => {
                 Chào mừng trở lại, {userName}! Đây là báo cáo tài chính của bạn.
               </p>
             </div>
-            <div className="flex items-center gap-4" ref={profileRef}>
-              <button onClick={() => setProfileOpen(p => !p)} className="flex items-center gap-3 p-1 pr-3 rounded-full hover:bg-gray-200 transition-colors">
-                <img src={`https://placehold.co/40x40/e0e7ff/3730a3?text=${avatarLetter}`} alt="Avatar" className="w-10 h-10 rounded-full" />
+            <div className="flex items-center gap-4 shadow-md rounded-full" ref={profileRef}>
+              <button onClick={() => setProfileOpen(p => !p)} className="flex items-center gap-3 p-2 rounded-full hover:bg-gray-100 transition-colors">
+                <img src={`https://placehold.co/40x40/10b981/ffffff?text=${avatarLetter}`} alt="Avatar" className="w-10 h-10 rounded-full" />
                 <span className="hidden sm:inline font-semibold text-gray-700">{userName}</span>
               </button>
               {isProfileOpen && <ProfileDropdown userInfo={userName} onLogout={handleLogOut} />}
@@ -146,19 +146,19 @@ const Dashboard = () => {
               title="Tổng thu nhập"
               amount={totalCard.data?.income || 0}
               icon={<TrendingUp size={24} className="text-green-500" />}
-              colorClass="bg-green-100"
+              colorClass="bg-emerald-100"
             />
             <StatCard
               title="Tổng chi tiêu"
               amount={totalCard.data?.expense || 0}
               icon={<TrendingDown size={24} className="text-red-500" />}
-              colorClass="bg-red-100"
+              colorClass="bg-emerald-100"
             />
             <StatCard
-              title="Số dư"
-              amount={totalCard.data?.balance || 0}
-              icon={<DollarSign size={24} className="text-blue-500" />}
-              colorClass="bg-blue-100"
+              title="Hạn mức chi tiêu"
+              amount={totalCard.data?.limit || 0}
+              icon={<PieChartIcon size={24} className="text-emerald-500" />}
+              colorClass="bg-emerald-100"
             />
             <StatCard
               title="Chi tiêu TB/ngày"

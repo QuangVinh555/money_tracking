@@ -122,8 +122,8 @@ export default function Transactions() {
 
   return (
     <>
-      <div className="bg-gray-100 p-6 rounded-2xl">
-        <div className="p-4 rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 border border-gray-200 mb-6">
+      <div className="bg-gradient-to-br from-gray-50 to-emerald-50 p-6 rounded-2xl">
+        <div className="p-4 rounded-lg bg-gradient-to-r from-emerald-50 to-teal-50 border border-gray-200 mb-6">
           <div className="mb-8 flex justify-between items-center">
             <h1 className="text-3xl font-bold text-gray-900">Quản lý giao dịch</h1>
           </div>
@@ -136,7 +136,7 @@ export default function Transactions() {
                 placeholder="Tên giao dịch..." 
                 value={descriptionsInput}
                 onChange={e => setDescriptionsInput(e.target.value)} 
-                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500" 
+                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-emerald-500 focus:border-emerald-500" 
               />            
             </div>
             <div>
@@ -144,7 +144,7 @@ export default function Transactions() {
               <select 
                 value={queryParams.transactionType}
                 onChange={e => handleQueryParamChange('transactionType', e.target.value)} 
-                className="w-full px-3 py-2 border rounded-lg bg-white focus:ring-purple-500 focus:border-purple-500"
+                className="w-full px-3 py-2 border rounded-lg bg-white focus:ring-emerald-500 focus:border-emerald-500"
               >                
                 <option value="">Tất cả</option>
                 <option value="1">Thu nhập</option>
@@ -241,7 +241,7 @@ export default function Transactions() {
                 <button
                   key={p}
                   onClick={() => gotoPage(p)}
-                  className={`px-3 py-1 border rounded-lg ${p === pageNumber ? 'bg-purple-600 text-white' : 'hover:bg-gray-100'}`}
+                  className={`px-3 py-1 border rounded-lg ${p === pageNumber ? 'bg-emerald-600 text-white' : 'hover:bg-gray-100'}`}
                 >
                   {p}
                 </button>
