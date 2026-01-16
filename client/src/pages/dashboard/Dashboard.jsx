@@ -146,19 +146,19 @@ const Dashboard = () => {
               title="Tổng thu nhập"
               amount={totalCard.data?.income || 0}
               icon={<TrendingUp size={24} className="text-green-500" />}
-              colorClass="bg-emerald-100"
+              colorClass="bg-green-100"
             />
             <StatCard
               title="Tổng chi tiêu"
               amount={totalCard.data?.expense || 0}
               icon={<TrendingDown size={24} className="text-red-500" />}
-              colorClass="bg-emerald-100"
+              colorClass="bg-red-100"
             />
             <StatCard
-              title="Hạn mức chi tiêu"
-              amount={totalCard.data?.limit || 0}
-              icon={<PieChartIcon size={24} className="text-emerald-500" />}
-              colorClass="bg-emerald-100"
+              title="Số dư"
+              amount={totalCard.data?.balance || 0}
+              icon={<DollarSign size={24} className="text-blue-500" />}
+              colorClass="bg-blue-100"
             />
             <StatCard
               title="Chi tiêu TB/ngày"
