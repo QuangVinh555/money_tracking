@@ -64,13 +64,13 @@ const BudgetOverview = ({ totalCard, changeDate, onEditLimit }) => {
 
 
     return (
-        <div className="mb-8 p-6 bg-white rounded-2xl shadow-lg border h-full">
+        <div className="mb-8 p-6 bg-gradient-to-br from-white to-emerald-50 rounded-2xl shadow-lg border h-full">
             <div className="flex justify-between items-center">
                 <div>
                     <h3 className="text-lg font-bold text-gray-800">Ngân sách tháng {nowMonth}</h3>
-                    <p className="text-2xl font-bold text-purple-700">{formatCurrency(totalCard.data?.remainingLimit)} <span className="text-base font-normal text-gray-500">còn lại</span></p>
+                    <p className="text-2xl font-bold text-emerald-700">{formatCurrency(totalCard.data?.remainingLimit)} <span className="text-base font-normal text-gray-500">còn lại</span></p>
                 </div>
-                <button onClick={onEditLimit} className="flex items-center gap-2 text-sm font-semibold text-purple-600 hover:text-purple-800">
+                <button onClick={onEditLimit} className="flex items-center gap-2 text-sm font-semibold text-emerald-600 hover:text-emerald-800">
                     <Edit size={16} />
                     Chỉnh sửa hạn mức
                 </button>
@@ -84,7 +84,7 @@ const BudgetOverview = ({ totalCard, changeDate, onEditLimit }) => {
                     <div className={`bg-gradient-to-r ${progressGradient} rounded-full h-3 transition-all duration-500`} style={{ width: `${Math.min(expenseProgress, 100)}%` }}></div>
                 </div>
                 {/* Phần thông tin bổ sung để lấp đầy khoảng trống */}
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 border border-emerald-100">
                     <h4 className="text-xs font-bold text-gray-500 uppercase mb-3 flex items-center gap-1">
                         <Lightbulb size={14} className="text-yellow-500" /> Phân tích & Gợi ý
                     </h4>

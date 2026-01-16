@@ -317,17 +317,17 @@ const GroupDetail = () => {
     const totalPages = Math.ceil(pagination.total / pagination.limit);
 
     return (
-        <div className="p-6 bg-gray-50 min-h-screen font-sans">
+        <div className="p-6 bg-gradient-to-br from-gray-50 to-emerald-50 min-h-screen font-sans">
             {/* Header */}
             <div className="flex justify-between items-start mb-8">
                 <div>
-                    <button onClick={() => navigate('/groups')} className="flex items-center gap-2 text-gray-500 hover:text-blue-600 mb-2 transition-colors">
+                    <button onClick={() => navigate('/groups')} className="flex items-center gap-2 text-gray-500 hover:text-emerald-600 mb-2 transition-colors">
                         <ArrowLeft size={20} /> Quay lại
                     </button>
-                    <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center gap-3">
+                    <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 flex items-center gap-3">
                         {groupDetail.groupName}
                         {isAdmin && (
-                            <button onClick={() => setShowEditGroup(true)} className="text-gray-400 hover:text-blue-600 p-1 transition-colors">
+                            <button onClick={() => setShowEditGroup(true)} className="text-gray-400 hover:text-emerald-600 p-1 transition-colors">
                                 <Edit size={20} />
                             </button>
                         )}
@@ -339,7 +339,7 @@ const GroupDetail = () => {
                     {isAdmin && (
                         <button
                             onClick={() => setShowAddMember(true)}
-                            className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2.5 rounded-xl hover:shadow-lg hover:opacity-90 transition-all font-semibold shadow-md"
+                            className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-5 py-2.5 rounded-xl hover:shadow-lg hover:opacity-90 transition-all font-semibold shadow-md"
                         >
                             <UserPlus size={18} /> <span className="hidden sm:inline">Thêm thành viên</span>
                         </button>
@@ -371,7 +371,7 @@ const GroupDetail = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 {/* Card 1: Budget Limit */}
                 <div
-                    className="group relative bg-gradient-to-br from-blue-500 to-indigo-600 p-6 rounded-2xl shadow-lg text-white cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                    className="group relative bg-gradient-to-br from-emerald-500 to-teal-600 p-6 rounded-2xl shadow-lg text-white cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
                     onClick={() => isAdmin && setShowLimitModal(true)}
                 >
                     <div className="absolute top-0 right-0 p-4 opacity-20">
@@ -379,7 +379,7 @@ const GroupDetail = () => {
                     </div>
                     <div className="relative z-10">
                         <div className="flex justify-between items-center mb-2">
-                            <span className="text-blue-100 font-medium text-sm uppercase tracking-wide">Hạn mức chi tiêu</span>
+                            <span className="text-emerald-100 font-medium text-sm uppercase tracking-wide">Hạn mức chi tiêu</span>
                         </div>
                         {budgetLimit > 0 ? (
                             <div>
@@ -387,13 +387,13 @@ const GroupDetail = () => {
                                 <div className="w-full bg-black/20 rounded-full h-2 mb-2 backdrop-blur-sm">
                                     <div className={`h-2 rounded-full ${progressPercent > 100 ? 'bg-red-400' : 'bg-white'}`} style={{ width: `${progressPercent}%` }}></div>
                                 </div>
-                                <p className="text-xs text-blue-100 font-medium">
+                                <p className="text-xs text-emerald-100 font-medium">
                                     {progressPercent > 100 ? '⚠️ Đã vượt quá hạn mức' : `Đã dùng ${progressPercent.toFixed(0)}%`}
                                 </p>
                             </div>
                         ) : (
                             <div className="flex flex-col h-full py-2">
-                                <p className="text-blue-100 text-lg font-medium opacity-80">Chưa thiết lập</p>
+                                <p className="text-emerald-100 text-lg font-medium opacity-80">Chưa thiết lập</p>
                                 <p className="text-white text-xs mt-1 underline decoration-white/50">Bấm để cài đặt</p>
                             </div>
                         )}
@@ -430,17 +430,17 @@ const GroupDetail = () => {
                 {/* Members Section */}
                 <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
                     <h3 className="font-bold text-gray-800 mb-6 text-xl flex items-center gap-2">
-                        <Shield size={20} className="text-blue-500" /> Thành viên ({groupDetail.members.length})
+                        <Shield size={20} className="text-emerald-500" /> Thành viên ({groupDetail.members.length})
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         {groupDetail.members.map(member => (
-                            <div key={member.groupMemberId} className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-transparent hover:border-blue-100 hover:bg-white hover:shadow-md transition-all group">
+                            <div key={member.groupMemberId} className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-transparent hover:border-emerald-100 hover:bg-white hover:shadow-md transition-all group">
                                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 text-slate-700 flex items-center justify-center font-bold text-lg shadow-inner">
                                     {member.fullName?.charAt(0).toUpperCase() || 'U'}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-base font-bold text-gray-800 truncate">{member.fullName}</p>
-                                    <p className={`text-xs font-semibold uppercase tracking-wider ${member.role === 'admin' ? 'text-blue-600' : 'text-gray-500'}`}>
+                                    <p className={`text-xs font-semibold uppercase tracking-wider ${member.role === 'admin' ? 'text-emerald-600' : 'text-gray-500'}`}>
                                         {member.role === 'admin' ? 'Quản trị viên' : 'Thành viên'}
                                     </p>
                                 </div>
@@ -457,13 +457,12 @@ const GroupDetail = () => {
                         ))}
                     </div>
                 </div>
-
                 {/* Transactions Section - Enhaced UI */}
-                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                <div className="bg-gradient-to-br from-white to-emerald-50 p-8 rounded-2xl shadow-lg border border-emerald-100">
                     <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
                         <div className="flex items-center gap-4">
                             <h3 className="font-bold text-gray-800 text-xl flex items-center gap-2">
-                                <Calendar size={20} className="text-blue-500" />
+                                <Calendar size={20} className="text-emerald-500" />
                                 <span className="hidden sm:inline">Lịch sử giao dịch</span>
                                 <span className="inline sm:hidden">Giao dịch</span>
                             </h3>
@@ -472,7 +471,7 @@ const GroupDetail = () => {
                                     type="month"
                                     value={selectedDate.substring(0, 7)}
                                     onChange={(e) => setSelectedDate(e.target.value + "-01")}
-                                    className="pl-3 pr-2 py-1.5 text-sm font-medium border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer bg-gray-50 hover:bg-white transition-colors"
+                                    className="pl-3 pr-2 py-1.5 text-sm font-medium border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent cursor-pointer bg-gray-50 hover:bg-white transition-colors"
                                 />
                             </div>
                         </div>
@@ -500,7 +499,7 @@ const GroupDetail = () => {
                             <tbody className="text-sm divide-y divide-gray-50">
                                 {transactions.length > 0 ? (
                                     transactions.map(tx => (
-                                        <tr key={tx.transactionId} className="hover:bg-blue-50/30 transition-colors">
+                                        <tr key={tx.transactionId} className="hover:bg-emerald-50/30 transition-colors">
                                             {/* Date */}
                                             <td className="px-6 py-4 text-gray-600 font-medium whitespace-nowrap">
                                                 {formatToLocalDateString(tx.transactionDate)}
@@ -545,7 +544,7 @@ const GroupDetail = () => {
                                                 <div className="flex items-center justify-center gap-1">
                                                     <button
                                                         onClick={() => { setTransactionToEdit(tx); setShowTransactionModal(true); }}
-                                                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                        className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                                                         title="Sửa"
                                                     >
                                                         <Edit size={18} />

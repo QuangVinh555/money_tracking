@@ -8,8 +8,8 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, children, loadin
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md flex flex-col">
                 <div className="p-6">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-red-100 rounded-full">
-                            <AlertTriangle className="text-red-600" size={24} />
+                        <div className="p-3 bg-emerald-100 rounded-full">
+                            <AlertTriangle className="text-emerald-600" size={24} />
                         </div>
                         <div>
                             <h2 className="text-xl font-bold text-gray-800">{title}</h2>
@@ -17,7 +17,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, children, loadin
                         </div>
                     </div>
                 </div>
-                <div className="bg-gray-50 px-6 py-4 flex justify-end gap-4 rounded-b-2xl">
+                <div className="bg-gradient-to-r from-emerald-50 to-teal-50 px-6 py-4 flex justify-end gap-4 rounded-b-2xl">
                     <button
                         onClick={onClose}
                         disabled={loading}
@@ -28,7 +28,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, children, loadin
                     <button
                         onClick={onConfirm}
                         disabled={loading}
-                        className="px-4 py-2 font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center justify-center gap-2"
+                        className="px-4 py-2 font-semibold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                         {loading && (
                             <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

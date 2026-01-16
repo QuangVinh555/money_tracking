@@ -119,7 +119,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen text-gray-800 font-sans">
+    <div className="bg-gradient-to-br from-gray-50 to-emerald-50 min-h-screen text-gray-800 font-sans">
       <div className="flex">
         {/* Sidebar */}
         {/* <Sidebar /> */}
@@ -132,9 +132,9 @@ const Dashboard = () => {
                 Chào mừng trở lại, {userName}! Đây là báo cáo tài chính của bạn.
               </p>
             </div>
-            <div className="flex items-center gap-4" ref={profileRef}>
-              <button onClick={() => setProfileOpen(p => !p)} className="flex items-center gap-3 p-1 pr-3 rounded-full hover:bg-gray-200 transition-colors">
-                <img src={`https://placehold.co/40x40/e0e7ff/3730a3?text=${avatarLetter}`} alt="Avatar" className="w-10 h-10 rounded-full" />
+            <div className="flex items-center gap-4 shadow-md rounded-full" ref={profileRef}>
+              <button onClick={() => setProfileOpen(p => !p)} className="flex items-center gap-3 p-2 rounded-full hover:bg-gray-100 transition-colors">
+                <img src={`https://placehold.co/40x40/10b981/ffffff?text=${avatarLetter}`} alt="Avatar" className="w-10 h-10 rounded-full" />
                 <span className="hidden sm:inline font-semibold text-gray-700">{userName}</span>
               </button>
               {isProfileOpen && <ProfileDropdown userInfo={userName} onLogout={handleLogOut} />}
@@ -183,7 +183,7 @@ const Dashboard = () => {
                 onDayClick={handleDayClick}
               />
             </div>
-            <div className="space-y-6">
+            <div>
               <RecentTransactions transactions={transactions} />
               {/* <ExpensePieChart data={expenseByCategory} /> */}
             </div>

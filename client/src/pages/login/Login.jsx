@@ -90,7 +90,7 @@ const Login = () => {
                     transition: all 0.2s ease-in-out;
                 }
             `}</style>
-            <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-200 to-purple-800 animate-gradient">
+            <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-emerald-200 to-teal-800 animate-gradient">
                 <div className="w-full max-w-md bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 md:p-10 border border-white/30">
                     <div className="flex justify-center mb-6 animate-fade-in-up">
                         <img
@@ -104,7 +104,7 @@ const Login = () => {
                         />
                     </div>
                     <div className="text-center mb-8">
-                        <h1 className="text-3xl md:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-700 animate-fade-in-up delay-100">
+                        <h1 className="text-3xl md:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-700 animate-fade-in-up delay-100">
                             Bắt Đầu Thông Minh
                         </h1>
                         <p className="text-gray-600 mt-2 animate-fade-in-up delay-200">Quản lý tài chính cá nhân chưa bao giờ dễ dàng hơn.</p>
@@ -112,15 +112,15 @@ const Login = () => {
                     <div className="mb-8 space-y-3">
                         {/* Benefit Items */}
                         <div className="flex items-start p-2 rounded-lg benefit-item animate-fade-in-up delay-300">
-                            <div className="flex-shrink-0 bg-blue-100 rounded-full p-2 mr-4"><TrendingUp className="h-5 w-5 text-blue-600" /></div>
+                            <div className="flex-shrink-0 bg-emerald-100 rounded-full p-2 mr-4"><TrendingUp className="h-5 w-5 text-emerald-600" /></div>
                             <div><h3 className="font-semibold text-gray-800">Đồng bộ hóa Đám mây</h3><p className="text-gray-500 text-sm">Truy cập dữ liệu của bạn an toàn từ mọi thiết bị.</p></div>
                         </div>
                         <div className="flex items-start p-2 rounded-lg benefit-item animate-fade-in-up delay-400">
-                            <div className="flex-shrink-0 bg-green-100 rounded-full p-2 mr-4"><BarChart3 className="h-5 w-5 text-green-600" /></div>
+                            <div className="flex-shrink-0 bg-teal-100 rounded-full p-2 mr-4"><BarChart3 className="h-5 w-5 text-teal-600" /></div>
                             <div><h3 className="font-semibold text-gray-800">Báo cáo Trực quan</h3><p className="text-gray-500 text-sm">Hiểu rõ thói quen chi tiêu qua biểu đồ chi tiết.</p></div>
                         </div>
                         <div className="flex items-start p-2 rounded-lg benefit-item animate-fade-in-up delay-500">
-                            <div className="flex-shrink-0 bg-purple-100 rounded-full p-2 mr-4"><Gem className="h-5 w-5 text-purple-600" /></div>
+                            <div className="flex-shrink-0 bg-cyan-100 rounded-full p-2 mr-4"><Gem className="h-5 w-5 text-cyan-600" /></div>
                             <div><h3 className="font-semibold text-gray-800">Bảo mật & An toàn</h3><p className="text-gray-500 text-sm">Dữ liệu của bạn được mã hóa và bảo vệ an toàn.</p></div>
                         </div>
                     </div>
@@ -131,15 +131,15 @@ const Login = () => {
                                 console.log('Login Failed');
                             }}
                         />
-                        <button onClick={handleLogin} className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-xl btn-hover">
+                        <button onClick={handleLogin} className="w-full py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold rounded-xl btn-hover">
                             Trải nghiệm bản Demo
                         </button>
                     </div>
                     <div className="mt-8 text-center animate-fade-in-up" style={{ animationDelay: '0.7s' }}>
                         <p className="text-xs text-gray-500">
                             Bằng việc tiếp tục, bạn đồng ý với
-                            <a href="#" className="font-medium text-indigo-600 hover:underline"> Điều khoản Dịch vụ</a> và
-                            <a href="#" className="font-medium text-indigo-600 hover:underline"> Chính sách Bảo mật</a>.
+                            <a href="#" className="font-medium text-emerald-600 hover:underline"> Điều khoản Dịch vụ</a> và
+                            <a href="#" className="font-medium text-emerald-600 hover:underline"> Chính sách Bảo mật</a>.
                         </p>
                     </div>
                 </div>

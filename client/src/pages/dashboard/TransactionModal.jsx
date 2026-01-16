@@ -118,7 +118,7 @@ const TransactionModal = ({
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 animate-fade-in">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col animate-scale-up">
         {/* Header */}
-        <div className="flex justify-between items-center p-5 border-b bg-gradient-to-r from-blue-50 to-indigo-100 rounded-t-2xl">
+        <div className="flex justify-between items-center p-5 border-b bg-gradient-to-r from-emerald-50 to-teal-100 rounded-t-2xl">
           <div>
             <h2 className="text-xl font-bold text-gray-800">
               Giao dịch trong ngày
@@ -156,7 +156,7 @@ const TransactionModal = ({
           }
 
           {/* Add new transaction form */}
-          <div className="bg-gray-50 p-4 rounded-lg border mb-6">
+          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 p-4 rounded-lg border border-emerald-100 mb-6">
             <h3 className="font-bold text-gray-700 mb-4">{transactionToEdit ? 'Chỉnh sửa giao dịch' : 'Thêm giao dịch mới'}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="flex gap-4">
@@ -210,7 +210,7 @@ const TransactionModal = ({
                   type="date"
                   value={chosenDate}
                   onChange={(e) => setChosenDate(e.target.value)}
-                  className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                  className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
                   required
                 />
               </div>
@@ -225,7 +225,7 @@ const TransactionModal = ({
               />
               <button
                 type="submit"
-                className="w-full py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+                className="w-full py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold rounded-lg hover:shadow-lg hover:opacity-90 transition-all flex items-center justify-center"
               >
                 {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : (transactionToEdit ? 'Lưu thay đổi' : 'Thêm giao dịch')}
               </button>
